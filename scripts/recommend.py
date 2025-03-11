@@ -2,14 +2,16 @@ import pandas as pd
 import numpy as np
 import pickle
 
-# Load the processed data and the trained KNN model
-df = pd.read_csv("data/processed_food_data.csv")
-with open("models/knn_model.pkl", "rb") as model_file:
-    knn = pickle.load(model_file)
-
+def load_data():
+    """Load processed food data and trained KNN model."""
+    df = pd.read_csv("data/processed_food_data.csv")
+    with open("models/knn_model.pkl", "rb") as model_file:
+        knn = pickle.load(model_file)
+    return df, knn
 
 def recommend_food(deficiencies, category=None):
     """Recommend food items based on a user's nutrient deficiencies, with optional category filtering."""
+    df, knn = load_data()
     
     # Define nutrients inside the function
     nutrients = ['calcium', 'potassium', 'zinc', 'vitamin_C', 'iron', 'magnesium', 'phosphorus', 'sodium', 'copper',
@@ -23,43 +25,30 @@ def recommend_food(deficiencies, category=None):
     invalid_nutrients = [d for d in deficiencies if d not in nutrients]
     if invalid_nutrients:
         return f"Invalid deficiencies: {', '.join(invalid_nutrients)}. Choose from: {', '.join(nutrients)}"
-
-    # Filter by category (if specified)
-    if category == 'Veg':
-        # Filter the dataframe based on the main category (e.g., 'Veg')
-        df_filtered = df[df['main_category'] == category]
-        if df_filtered.empty:
-            return f"No data found for the category: {category}."
-    else:
-        df_filtered = df  # If no category is selected, use the whole dataframe
-
-    # Check if df_filtered contains data
-    if df_filtered.shape[0] == 0:
-        return "No data available for the selected category."
-
+       
     # Create a query vector: 1 for deficient nutrients, 0 for others
     sample = np.zeros(len(nutrients))
     for deficiency in deficiencies:
-        sample[nutrients.index(deficiency)] = 1  # Targeting deficient nutrients
-
-    # Use the pre-trained KNN model to get recommendations
-    distances, indices = knn.kneighbors([sample])
-
-    # Debugging: Check the values of indices
-    print(f"Indices from KNN: {indices}")
-
-    # Ensure indices are valid and within bounds
-    valid_indices = [idx for idx in indices[0] if idx < len(df_filtered)]
+        sample[nutrients.index(deficiency)] = 1
     
-    if len(valid_indices) == 0:
-        return "No valid food recommendations available."
-
-    # Now use the valid indices for recommendation
-    recommendations = df_filtered.iloc[valid_indices][['description'] + deficiencies]
-
+    # Use KNN to get recommendations
+    distances, indices = knn.kneighbors([sample])
+    
+    # Extract recommendations from the full dataset first
+    recommended_items = df.iloc[indices[0] % len(df)]  # Ensure valid indices
+    
+    # If category is 'Veg', filter the recommendations
+    if category == 'Veg':
+        recommended_items = recommended_items[recommended_items['main_category'] == category]
+    
+    if recommended_items.empty:
+        return f"No valid food recommendations available for the selected category: {category}"
+    
     # Format recommendations as a list of strings
     recommendation_list = [f"\nRecommendations for {' and '.join(deficiencies)} Deficiency:"]
-    for i, row in recommendations.iterrows():
-        recommendation_list.append(f"Food: {row['description']}, {', '.join([f'{d.capitalize()}: {row[d]} mg' for d in deficiencies])}")
-
+    for _, row in recommended_items.iterrows():
+        recommendation_list.append(
+            f"Food: {row['description']}, {', '.join([f'{d.capitalize()}: {row[d]} mg' for d in deficiencies])}"
+        )
+    
     return "\n".join(recommendation_list)
