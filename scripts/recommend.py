@@ -12,7 +12,7 @@ def load_data():
 def recommend_food(deficiencies, category=None):
     """Recommend food items based on a user's nutrient deficiencies, with optional category filtering."""
     df, knn = load_data()
-    
+    print("from recommend_food: deficiencies: ", deficiencies, "category: ", category)
     # Define nutrients inside the function
     nutrients = ['calcium', 'potassium', 'zinc', 'vitamin_C', 'iron', 'magnesium', 'phosphorus', 'sodium', 'copper',
                  'vitamin_E', 'thiamin', 'riboflavin', 'cholesterol', 'Niacin', 'vitamin_B_6', 'choline_total',
@@ -47,8 +47,12 @@ def recommend_food(deficiencies, category=None):
     # Format recommendations as a list of strings
     recommendation_list = [f"\nRecommendations for {' and '.join(deficiencies)} Deficiency:"]
     for _, row in recommended_items.iterrows():
-        recommendation_list.append(
-            f"Food: {row['description']}, {', '.join([f'{d.capitalize()}: {row[d]} mg' for d in deficiencies])}"
-        )
+        #recommendation_list.append(
+        #    f"Food: {row['description']}, {', '.join([f'{d.capitalize()}: {row[d]} mg' for d in deficiencies])}"
+        #)
+        recommendation_list.append(f"\n{row['description']}")
+        
     
+    print(recommendation_list)
+
     return "\n".join(recommendation_list)
