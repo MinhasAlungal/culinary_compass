@@ -47,9 +47,11 @@ def recommend_food(deficiencies, category=None):
     # Format recommendations as a list of strings
     recommendation_list = [f"\nRecommendations for {' and '.join(deficiencies)} Deficiency:"]
     for _, row in recommended_items.iterrows():
-        recommendation_list.append(
-            f"Food: {row['description']}, {', '.join([f'{d.capitalize()}: {row[d]} mg' for d in deficiencies])}"
-        )
+        #recommendation_list.append(
+        #    f"Food: {row['description']}, {', '.join([f'{d.capitalize()}: {row[d]} mg' for d in deficiencies])}"
+        #)
+        recommendation_list.append(f"\n{row['description']}")
+        
     
     print(recommendation_list)
 
