@@ -5,7 +5,9 @@ import requests
 import os
 from scripts.recommend import recommend_food
 
-API_URL = "http://127.0.0.1:8000/save-history/"
+API_BASE_URL = "http://127.0.0.1:8000"
+SAVE_HISTORY_URL = f"{API_BASE_URL}/save-history/"
+GET_RECOMMENDATION_URL = f"{API_BASE_URL}/get-recommendation/"
 
 @st.cache_data
 def load_data():
@@ -34,13 +36,25 @@ def calculate_bmi(weight, height):
     return bmi, category
 
 def get_recommendation(preference, deficiencies):
-    """Fetch food recommendations based on user inputs."""
-    return recommend_food(deficiencies if deficiencies else 'none', category=preference)
+    try:
+        response = requests.post(
+            GET_RECOMMENDATION_URL,
+            json={"food_preference": preference, "deficiencies": deficiencies},
+            timeout=5
+        )
+        if response.status_code == 200:
+            return response.json()["recommendation"]
+        else:
+            st.error(f"API Error: {response.text}")
+            return None
+    except requests.exceptions.RequestException as e:
+        st.error(f"API Connection Error: {str(e)}")
+        return None
 
 def save_to_api(user_data):
     """Send user data to API and return success status."""
     try:
-        response = requests.post(API_URL, json=user_data, timeout=5)
+        response = requests.post(SAVE_HISTORY_URL, json=user_data, timeout=5)
         return response.status_code == 200
     except requests.exceptions.RequestException as e:
         st.error(f"API Error: {str(e)}")
