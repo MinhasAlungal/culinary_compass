@@ -3,8 +3,13 @@ from pydantic import BaseModel
 from datetime import datetime
 import pandas as pd
 import os
+from scripts.recommend import recommend_food
 
 app = FastAPI()
+
+class RecommendationRequest(BaseModel):
+    food_preference: str
+    deficiencies: list
 
 class UserHistory(BaseModel):
     name: str
@@ -20,6 +25,18 @@ class UserHistory(BaseModel):
 
 HISTORY_FILE = "history.xlsx"
 SHEET_NAME = 'User History'
+
+@app.post("/get-recommendation/")
+async def get_recommendation(data: RecommendationRequest):
+    """Get food recommendations based on preferences and deficiencies."""
+    try:
+        recommendation = recommend_food(
+            data.deficiencies if data.deficiencies else 'none', 
+            category=data.food_preference
+        )
+        return {"recommendation": recommendation}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/save-history/")
 async def save_history(data: UserHistory):
