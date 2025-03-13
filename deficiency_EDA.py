@@ -6,7 +6,7 @@
 import pandas as pd 
 import matplotlib.pyplot as plt
 import seaborn as sns
-import plotly.express as px
+#import plotly.express as px
 
 # this is how we import streamlit
 import streamlit as st
@@ -14,7 +14,10 @@ import streamlit as st
 st.title("Lets Explore the Deficiency Data")
 
 # Load the data set
-# penguins = pd.read_excel("data/food_data.xlsx")
+df = pd.read_excel("data/food_data.xlsx")
+
+
+
 
 # st.dataframe(penguins)
 

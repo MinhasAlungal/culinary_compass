@@ -64,7 +64,13 @@ def main():
         if selected_deficiencies:
             st.write(f"**Selected Deficiencies:** {', '.join(selected_deficiencies)}")
         st.success(recommendation)
-        
+
+
+    # Moving to Recipe page
+    if st.button("Go to Recipe Page"):
+        st.switch_page("pages/Recipe_selection.py") 
+
+
     # Footer
     st.markdown("---")
     st.caption(f"Food Recommendation System | {date.today().year}")
