@@ -15,6 +15,7 @@ df = pd.read_excel("data/food_data.xlsx")
 
 
 
+
 # Let's add a sidebar for navigation and the page names
 
 #st.sidebar.page_link(page='pages/food_recommendation.py',label='Food Recommendation', icon='📊')
