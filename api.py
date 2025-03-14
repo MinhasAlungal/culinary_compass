@@ -26,7 +26,7 @@ class UserHistory(BaseModel):
 HISTORY_FILE = "history.xlsx"
 SHEET_NAME = 'User History'
 
-@app.post("/get-recommendation/")
+@app.get("/get-recommendation/")
 async def get_recommendation(data: RecommendationRequest):
     """Get food recommendations based on preferences and deficiencies."""
     try:

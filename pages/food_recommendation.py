@@ -37,7 +37,7 @@ def calculate_bmi(weight, height):
 
 def get_recommendation(preference, deficiencies):
     try:
-        response = requests.post(
+        response = requests.get(
             GET_RECOMMENDATION_URL,
             json={"food_preference": preference, "deficiencies": deficiencies},
             timeout=5
