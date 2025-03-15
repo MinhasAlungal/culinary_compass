@@ -46,13 +46,40 @@ def recommend_food(deficiencies, category=None):
     
     # Format recommendations as a list of strings
     recommendation_list = [f"\nRecommendations for {' and '.join(deficiencies)} Deficiency:"]
-    for _, row in recommended_items.iterrows():
+    #for _, row in recommended_items.iterrows():
         #recommendation_list.append(
         #    f"Food: {row['description']}, {', '.join([f'{d.capitalize()}: {row[d]} mg' for d in deficiencies])}"
         #)
-        recommendation_list.append(f"\n{row['description']}")
+        #recommendation_list.append(f"\n{row['description']}")
         
     
-    print(recommendation_list)
+    #print(recommendation_list)
 
+    #return "\n".join(recommendation_list)
+    grouped_recommendations = {}
+
+# Iterate over each row in the DataFrame
+    for _, row in recommended_items.iterrows():
+        sub_category = row['sub_category']  # Get the sub-category
+        food = row['description']  # Get the food description
+
+    # If sub-category is not in the dictionary, create a new entry
+        if sub_category not in grouped_recommendations:
+            grouped_recommendations[sub_category] = []
+
+    # Append the food to the list of the sub-category
+        grouped_recommendations[sub_category].append(food)
+
+    recommendation_list = []
+
+    for sub_category, foods in grouped_recommendations.items():
+    # Add the sub-category title
+        recommendation_list.append(f"\n {sub_category}")
+    
+    # Add each food under the sub-category
+        for food in foods:
+            recommendation_list.append(f"  - {food}")
+
+# Print the formatted recommendations list
+    print("\n".join(recommendation_list))
     return "\n".join(recommendation_list)
