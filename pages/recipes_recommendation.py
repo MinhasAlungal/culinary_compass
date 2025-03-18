@@ -2,17 +2,18 @@
 import pandas as pd 
 import matplotlib.pyplot as plt
 import seaborn as sns
-#import plotly.express as px
-
-# this is how we import streamlit
 import streamlit as st
+from datetime import date
+import requests
+
 
 st.title("Recipes Based On User Preferences")
+# Load the dataset
+df =pd.read_csv("data/preprocessed/recipes.csv")
 
-# Load the data set
-df = pd.read_excel("data/food_data.xlsx")
 
-
+# Now display the DataFrame
+st.write(df.head(5))
 
 
 
@@ -25,13 +26,13 @@ df = pd.read_excel("data/food_data.xlsx")
 # Getting user preferences
 st.sidebar.write('Select Preferences')
 
-calories = st.sidebar.slider(label='Calories', min_value=0, max_value=100)
-Fat = st.sidebar.slider(label='Fat', min_value=0, max_value=100)
-Saturated_fat = st.sidebar.slider(label='Saturated Fat', min_value=0, max_value=100)
-Cholesterol = st.sidebar.slider(label='Cholesterol', min_value=0, max_value=100)
-Sodium = st.sidebar.slider(label='Sodium', min_value=0, max_value=100)
-Carbohydrate = st.sidebar.slider(label='Carbohydrate', min_value=0, max_value=100)
-Fiber = st.sidebar.slider(label='Fiber', min_value=0, max_value=100)
-Sugar = st.sidebar.slider(label='Sugar', min_value=0, max_value=100)
-Protein = st.sidebar.slider(label='Protein', min_value=0, max_value=100)
+calories = st.sidebar.slider(label='Calories', min_value= df['Calories'].min(), max_value= df['Calories'].max())
+Fat = st.sidebar.slider(label='Fat', min_value= df['FatContent'].min(), max_value= df['FatContent'].max())
+Saturated_fat = st.sidebar.slider(label='Saturated Fat',min_value= df['SaturatedFatContent'].min(), max_value= df['SaturatedFatContent'].max())
+Cholesterol = st.sidebar.slider(label='Cholesterol',min_value= df['CholesterolContent'].min(), max_value= df['CholesterolContent'].max())
+Sodium = st.sidebar.slider(label='Sodium', min_value= df['SodiumContent'].min(), max_value= df['SodiumContent'].max())
+Carbohydrate = st.sidebar.slider(label='Carbohydrate',min_value= df['CarbohydrateContent'].min(), max_value= df['CarbohydrateContent'].max())
+Fiber = st.sidebar.slider(label='Fiber',min_value= df['FiberContent'].min(), max_value= df['FiberContent'].max())
+Sugar = st.sidebar.slider(label='Sugar',min_value= df['SugarContent'].min(), max_value= df['SugarContent'].max())
+Protein = st.sidebar.slider(label='Protein',min_value= df['ProteinContent'].min(), max_value= df['ProteinContent'].max())
 
