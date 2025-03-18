@@ -60,6 +60,25 @@ def save_to_api(user_data):
         st.error(f"API Error: {str(e)}")
         return False
 
+def save_to_session(user_data: dict, recommendation: str):
+    """Save user data and recommendations to session state."""
+    # Save user data
+    st.session_state['user_data'] = user_data
+    
+    # Parse and save recommendations
+    food_items = []
+    for line in recommendation.split('\n'):
+        if line.startswith('- '):
+            # Extract food name and category from the line "- Food Name (Category)"
+            food_info = line[2:].split(' (')  # Remove "- " and split by " ("
+            if len(food_info) == 2:
+                food_name = food_info[0]
+                category = food_info[1].rstrip(')')
+                food_items.append({"name": food_name, "category": category})
+    
+    st.session_state['recommended_foods'] = food_items
+    print("Saved to session:", st.session_state) 
+
 def main():
     """Main function to run the Streamlit app."""
     st.set_page_config(page_title="Food Recommendation System", layout="wide")
@@ -120,6 +139,16 @@ def main():
             print("User history saved successfully!")
         else:
             print("Failed to save history.")
+        
+        # Save to session state
+        save_to_session(user_data, recommendation)
+        
+        # Add button to navigate to recipe selection
+        if st.button("Select Recipes for These Foods"):
+            # Navigation to the recipes recommendation page
+            # st.experimental_set_query_params(page="recipe_recommendation.py")
+            # st.switch_page("pages/recipe_recommendation.py")
+            st.page_link("pages/recipe_recommendation.py", label="Go to recipe recommendation")
 
     # Footer
     st.markdown("---")
