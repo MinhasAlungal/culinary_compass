@@ -36,3 +36,9 @@ Fiber = st.sidebar.slider(label='Fiber',min_value= df['FiberContent'].min(), max
 Sugar = st.sidebar.slider(label='Sugar',min_value= df['SugarContent'].min(), max_value= df['SugarContent'].max())
 Protein = st.sidebar.slider(label='Protein',min_value= df['ProteinContent'].min(), max_value= df['ProteinContent'].max())
 
+# Get data from session state
+user_data = st.session_state.user_data
+recommended_foods = st.session_state.recommended_foods
+
+st.write(user_data)
+st.write(recommended_foods)
