@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from datetime import datetime
 import pandas as pd
 import os
-from scripts.recommend import recommend_food
+from scripts.food_recommend import recommend_food
 
 app = FastAPI()
 
@@ -23,7 +23,7 @@ class UserHistory(BaseModel):
     deficiencies: list
     recommendation: str
 
-HISTORY_FILE = "history.xlsx"
+HISTORY_FILE = "data/user_log/food.xlsx"
 SHEET_NAME = 'User History'
 
 @app.get("/get-recommendation/")
