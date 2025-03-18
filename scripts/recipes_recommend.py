@@ -2,17 +2,24 @@ import numpy as np
 import pandas as pd
 import torch
 from sentence_transformers import SentenceTransformer, util
+import pickle
 
-# Load dataset with embeddings
-df = pd.read_csv("data/recipes_with_embeddings.csv")
-df["IngredientEmbedding"] = df["IngredientEmbedding"].apply(lambda x: torch.tensor(eval(x)))
+
+
 
 # Load model
-model = SentenceTransformer("all-MiniLM-L6-v2")
+
+def load_data():
+    """ Load dataset with embeddings"""
+    df = pd.read_csv("data/embeddings/recipes.csv")
+    df["IngredientEmbedding"] = df["IngredientEmbedding"].apply(lambda x: torch.tensor(eval(x)))
+    with open("models/recipes_st.pkl", "rb") as model_file:
+        model_st = pickle.load(model_file)
+    return df, model_st
 
 def recommend_recipes(nutrients, ingredients, diet_preference):
     """Recommend recipes based on user nutrients, ingredients, and dietary preference."""
-    
+    df, model_st = load_data()
     # Filter by dietary preference
     if diet_preference != "Any":
         df_filtered = df[df["DietaryCategory"] == diet_preference].copy()
@@ -20,7 +27,7 @@ def recommend_recipes(nutrients, ingredients, diet_preference):
         df_filtered = df.copy()
 
     # Encode input ingredients
-    input_embedding = model.encode(" ".join(ingredients), convert_to_tensor=True)
+    input_embedding = model_st.encode(" ".join(ingredients), convert_to_tensor=True)
 
     # Compute cosine similarity
     ingredient_similarities = util.pytorch_cos_sim(
