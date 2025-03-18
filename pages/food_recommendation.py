@@ -3,7 +3,7 @@ import streamlit as st
 from datetime import date
 import requests
 import os
-from scripts.recommend import recommend_food
+from scripts.food_recommend import recommend_food
 
 API_BASE_URL = "http://127.0.0.1:8000"
 SAVE_HISTORY_URL = f"{API_BASE_URL}/save-history/"
@@ -12,7 +12,7 @@ GET_RECOMMENDATION_URL = f"{API_BASE_URL}/get-recommendation/"
 @st.cache_data
 def load_data():
     """Load processed food data and extract unique categories."""
-    df = pd.read_csv("data/processed_food_data.csv")
+    df = pd.read_csv("data/preprocessed/food.csv")
     categories = df["main_category"].unique().tolist()
     deficiencies = [
         'calcium', 'potassium', 'zinc', 'vitamin_C', 'iron', 'magnesium', 

@@ -16,3 +16,4 @@ openpyxl
 requests
 fastapi
 uvicorn
+sentence-transformers
