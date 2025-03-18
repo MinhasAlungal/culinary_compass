@@ -1,27 +1,41 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
+from typing import List, Dict
 import pandas as pd
 import os
 from scripts.food_recommend import recommend_food
+import json
+from threading import Lock
 
 app = FastAPI()
+lock = Lock()
 
 class RecommendationRequest(BaseModel):
     food_preference: str
     deficiencies: list
 
 class UserHistory(BaseModel):
-    name: str
-    age: int
-    gender: str
-    weight: float
-    height: float
-    bmi: float
-    bmi_category: str
-    food_preference: str
-    deficiencies: list
-    recommendation: str
+    name: str = Field(..., min_length=1)
+    age: int = Field(..., gt=0, lt=150)
+    gender: str = Field(..., min_length=1)
+    height: float = Field(..., gt=0)
+    weight: float = Field(..., gt=0)
+    bmi: float = Field(..., gt=0)
+    bmi_category: str = Field(..., min_length=1)
+    food_preference: str = Field(..., min_length=1)
+    deficiencies: List[str] = Field(default_factory=list)
+    recommendations: str = Field(..., min_length=1)
+
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
+        # Add schema validation
+        validate_assignment = True
+        # Allow extra fields
+        extra = "ignore"
+
 
 HISTORY_FILE = "data/user_log/food.xlsx"
 SHEET_NAME = 'User History'
@@ -39,33 +53,30 @@ async def get_recommendation(data: RecommendationRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/save-history/")
-async def save_history(data: UserHistory):
-    """Save user details and recommendation to Excel file."""
+async def save_history(user_history: UserHistory):
+    file_path = "data/user_log/food.xlsx"
+
     try:
-        new_entry = {
-            "Timestamp": datetime.now(),
-            "Name": data.name,
-            "Age": data.age,
-            "Gender": data.gender,
-            "Weight (kg)": data.weight,
-            "Height (m)": data.height,
-            "BMI": data.bmi,
-            "BMI Category": data.bmi_category,
-            "Food Preference": data.food_preference,
-            "Deficiencies": ", ".join(data.deficiencies) if data.deficiencies else "None",
-            "Recommendation": data.recommendation
-        }
+        history_dict = user_history.model_dump()
 
-        df = pd.DataFrame([new_entry])
-        if os.path.exists(HISTORY_FILE):
-            existing_df = pd.read_excel(HISTORY_FILE)
-            df = pd.concat([existing_df, df], ignore_index=True)
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-        df.to_excel(HISTORY_FILE, index=False, sheet_name=SHEET_NAME)
-        return {"message": "History saved successfully!"}
+        # Convert dictionary to DataFrame
+        new_data = pd.DataFrame([history_dict])
 
+        with lock:  # Ensure thread safety
+            if not os.path.exists(file_path):
+                new_data.to_excel(file_path, index=False)  # Write with headers
+            else:
+                with pd.ExcelWriter(file_path, mode='a', if_sheet_exists='overlay', engine="openpyxl") as writer:
+                    sheet = writer.sheets['Sheet1']
+                    new_data.to_excel(writer, index=False, header=False, startrow=sheet.max_row)
+
+        return {"message": "History saved successfully"}
+    
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Failed to save history: {str(e)}")
 
 @app.get("/get-history/")
 async def get_history():

@@ -4,12 +4,12 @@ from datetime import date
 import requests
 import os
 from scripts.food_recommend import recommend_food
+import json
 
 API_BASE_URL = "http://127.0.0.1:8000"
 SAVE_HISTORY_URL = f"{API_BASE_URL}/save-history/"
 GET_RECOMMENDATION_URL = f"{API_BASE_URL}/get-recommendation/"
 
-@st.cache_data
 def load_data():
     """Load processed food data and extract unique categories."""
     df = pd.read_csv("data/preprocessed/food.csv")
@@ -51,33 +51,55 @@ def get_recommendation(preference, deficiencies):
         st.error(f"API Connection Error: {str(e)}")
         return None
 
-def save_to_api(user_data):
-    """Send user data to API and return success status."""
-    try:
-        response = requests.post(SAVE_HISTORY_URL, json=user_data, timeout=5)
-        return response.status_code == 200
-    except requests.exceptions.RequestException as e:
-        st.error(f"API Error: {str(e)}")
-        return False
-
-def save_to_session(user_data: dict, recommendation: str):
+def save_to_session(user_data: dict, recommendation: list):
     """Save user data and recommendations to session state."""
-    # Save user data
-    st.session_state['user_data'] = user_data
-    
-    # Parse and save recommendations
-    food_items = []
-    for line in recommendation.split('\n'):
-        if line.startswith('- '):
-            # Extract food name and category from the line "- Food Name (Category)"
-            food_info = line[2:].split(' (')  # Remove "- " and split by " ("
-            if len(food_info) == 2:
-                food_name = food_info[0]
-                category = food_info[1].rstrip(')')
-                food_items.append({"name": food_name, "category": category})
-    
-    st.session_state['recommended_foods'] = food_items
-    print("Saved to session:", st.session_state) 
+    try:
+        # Save user data and recommendations to session state
+        st.session_state['user_data'] = user_data
+        st.session_state['recommended_foods'] = recommendation
+        print("Successfully saved to session state:", st.session_state)
+    except Exception as e:
+        print(f"Error saving to session state: {str(e)}")
+        st.error("Failed to save data to session. Please try again.")
+
+def save_to_api(user_data: dict, recommendation: list):
+    """Save user data and recommendations to API."""
+    try:
+        # Convert recommendation list to formatted string
+        recommendation_str = ""
+        for main_cat in recommendation:
+            recommendation_str += f"\n{main_cat['main_category']}\n"
+            for sub_cat in main_cat['sub_categories']:
+                recommendation_str += f"{sub_cat['name']}\n"
+                for food in sub_cat['foods']:
+                    recommendation_str += f"  - {food}\n"
+        
+        # Prepare data to match UserHistory model
+        history_data = {
+            "name": str(user_data['name']),
+            "age": int(user_data['age']),
+            "gender": str(user_data['gender']),
+            "height": float(user_data['height']),
+            "weight": float(user_data['weight']),
+            "bmi": float(user_data['bmi']),
+            "bmi_category": str(user_data['bmi_category']),
+            "food_preference": str(user_data['food_preference']),
+            "deficiencies": list(user_data['deficiencies']),
+            "recommendations": recommendation_str
+        }
+        
+        # Make API call to save history
+        response = requests.post(SAVE_HISTORY_URL, json=history_data)
+        if response.status_code == 200:
+            print("History saved successfully!")
+        else:
+            print(f"Failed to save history. Status code: {response.status_code}")
+            print(f"Response: {response.text}")
+            st.error("Failed to save history.")
+            
+    except Exception as e:
+        print(f"Error saving to API: {str(e)}")
+        st.error("Failed to save data to API. Please try again.")
 
 def main():
     """Main function to run the Streamlit app."""
@@ -107,21 +129,36 @@ def main():
         if not name:
             st.warning("Please enter your name before proceeding.")
             return
-        
+
         bmi, bmi_category = calculate_bmi(weight, height)
         recommendation = get_recommendation(food_preference, selected_deficiencies)
-        
-        # Display Results
+
+        # Display User Info
         st.subheader(f"Hello, {name}! Here's your food recommendation:")
         st.write(f"**Age:** {age}  |  **Gender:** {gender}")
         st.write(f"**BMI:** {bmi}  |  **Category:** {bmi_category}")
-        
+
         if selected_deficiencies:
             st.write(f"**Selected Deficiencies:** {', '.join(selected_deficiencies)}")
-        
-        st.success(recommendation)
 
-        # Save to API
+        if recommendation:
+            st.subheader("Recommended Foods:")
+            
+            # Show full JSON (collapsible) response from API -- for debugging
+            with st.expander("View Raw JSON Response"):
+                st.json(recommendation)
+
+            # Display in a structured way for the user
+            for category in recommendation:
+                st.markdown(f"### {category['main_category']}")  # Main category as header
+                for sub_cat in category['sub_categories']:
+                    with st.expander(f"**{sub_cat['name']}** ({len(sub_cat['foods'])} items)"):
+                        st.write(", ".join(sub_cat["foods"]))
+
+        else:
+            st.error("No recommendations found. Try selecting different preferences or deficiencies.")
+
+        # Save user history
         user_data = {
             "name": name,
             "age": age,
@@ -134,20 +171,15 @@ def main():
             "deficiencies": selected_deficiencies,
             "recommendation": recommendation
         }
-        
-        if save_to_api(user_data):
-            print("User history saved successfully!")
-        else:
-            print("Failed to save history.")
-        
+
+        # Save to user log file
+        save_to_api(user_data, recommendation)
+
         # Save to session state
         save_to_session(user_data, recommendation)
-        
-        # Add button to navigate to recipe selection
+
+        # Navigation to recipe selection
         if st.button("Select Recipes for These Foods"):
-            # Navigation to the recipes recommendation page
-            # st.experimental_set_query_params(page="recipe_recommendation.py")
-            # st.switch_page("pages/recipe_recommendation.py")
             st.page_link("pages/recipe_recommendation.py", label="Go to recipe recommendation")
 
     # Footer
