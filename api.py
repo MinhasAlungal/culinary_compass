@@ -11,6 +11,9 @@ from threading import Lock
 app = FastAPI()
 lock = Lock()
 
+HISTORY_FILE = "data/user_log/food.xlsx"
+SHEET_NAME = 'User History'
+
 class RecommendationRequest(BaseModel):
     food_preference: str
     deficiencies: list
@@ -36,10 +39,6 @@ class UserHistory(BaseModel):
         # Allow extra fields
         extra = "ignore"
 
-
-HISTORY_FILE = "data/user_log/food.xlsx"
-SHEET_NAME = 'User History'
-
 @app.get("/get-recommendation/")
 async def get_recommendation(data: RecommendationRequest):
     """Get food recommendations based on preferences and deficiencies."""
@@ -54,22 +53,22 @@ async def get_recommendation(data: RecommendationRequest):
 
 @app.post("/save-history/")
 async def save_history(user_history: UserHistory):
-    file_path = "data/user_log/food.xlsx"
+    # file_path = "data/user_log/food.xlsx"
 
     try:
         history_dict = user_history.model_dump()
 
         # Ensure directory exists
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
 
         # Convert dictionary to DataFrame
         new_data = pd.DataFrame([history_dict])
 
         with lock:  # Ensure thread safety
-            if not os.path.exists(file_path):
-                new_data.to_excel(file_path, index=False)  # Write with headers
+            if not os.path.exists(HISTORY_FILE):
+                new_data.to_excel(HISTORY_FILE, index=False)  # Write with headers
             else:
-                with pd.ExcelWriter(file_path, mode='a', if_sheet_exists='overlay', engine="openpyxl") as writer:
+                with pd.ExcelWriter(HISTORY_FILE, mode='a', if_sheet_exists='overlay', engine="openpyxl") as writer:
                     sheet = writer.sheets['Sheet1']
                     new_data.to_excel(writer, index=False, header=False, startrow=sheet.max_row)
 
