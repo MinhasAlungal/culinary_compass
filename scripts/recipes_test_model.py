@@ -13,7 +13,7 @@ user_ingredients = [ "Egg, whole, raw, frozen, salted, pasteurized", "Cheese, Am
                       "Mollusks, clam, mixed species, raw",  "Seaweed, wakame, raw",
                     "Cream cheese, full fat, block"]
 # Define the diet preference
-diet_preference = "Any"# You can set this to "Vegetarian", "Non-Vegetarian", or "Any" based on user input
+diet_preference = "Non-veg"# You can set this to "Vegetarian", "Non-Vegetarian", or "Any" based on user input
 
 # Step 8: Get recommendations
 recommendations = recommend_recipes(user_nutrients, user_ingredients, diet_preference)

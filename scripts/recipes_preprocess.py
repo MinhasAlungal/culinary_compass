@@ -41,8 +41,8 @@ def classify_recipe(ingredients):
 
     # Step 3: Check for partial matches
     if any(any(non_veg in ingredient for non_veg in non_veg_ingredients) for ingredient in ingredient_list):
-        return "Non-Vegetarian"
-    return "Vegetarian"
+        return "Non-veg" #Non-Vegetarian to Non-veg
+    return "Veg" #Vegetarian to Veg
 
 # Apply classification
 df["DietaryCategory"] = df["RecipeIngredientParts"].apply(classify_recipe)

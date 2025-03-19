@@ -21,7 +21,8 @@ def recommend_recipes(nutrients, ingredients, diet_preference):
     """Recommend recipes based on user nutrients, ingredients, and dietary preference."""
     df, model_st = load_data()
     # Filter by dietary preference
-    if diet_preference != "Any":
+    #if diet_preference != "Any":
+    if diet_preference == "Veg":
         df_filtered = df[df["DietaryCategory"] == diet_preference].copy()
     else:
         df_filtered = df.copy()
@@ -51,4 +52,14 @@ def recommend_recipes(nutrients, ingredients, diet_preference):
     df_filtered["SimilarityScore"] = final_scores
     top_recipes = df_filtered.sort_values(by="SimilarityScore", ascending=False).head(5)
 
-    return top_recipes[["Name", "Images", "RecipeInstructions"]].to_dict(orient="records")
+    #return top_recipes[["Name", "Images", "RecipeInstructions"]].to_dict(orient="records")
+    return top_recipes[
+    [
+        "Name", "CookTime", "Images", "RecipeCategory", "Keywords", 
+        "RecipeIngredientQuantities", "RecipeIngredientParts", 
+        "Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", 
+        "SodiumContent", "CarbohydrateContent", "FiberContent", 
+        "SugarContent", "ProteinContent", "RecipeInstructions", "DietaryCategory"
+    ]
+].to_dict(orient="records")
+
