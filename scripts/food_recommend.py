@@ -9,6 +9,53 @@ def load_data():
         knn = pickle.load(model_file)
     return df, knn
 
+def format_recommendations(recommended_items):
+    """
+    Format the recommendations into a structured list of categories and food items.
+    Args:
+        recommended_items (DataFrame): DataFrame containing food recommendations
+    Returns:
+        list: Formatted list of recommendations grouped by main and sub categories
+    """
+    # Create a dictionary to store the structured data
+    formatted_data = {}
+    
+    # Iterate through each row in the DataFrame
+    for _, row in recommended_items.iterrows():
+        main_cat = row['main_category']
+        sub_cat = row['sub_category']
+        food_name = row['description']
+        
+        # Create main category if it doesn't exist
+        if main_cat not in formatted_data:
+            formatted_data[main_cat] = {}
+            
+        # Create sub category if it doesn't exist
+        if sub_cat not in formatted_data[main_cat]:
+            formatted_data[main_cat][sub_cat] = []
+            
+        # Add food item to appropriate sub category
+        formatted_data[main_cat][sub_cat].append(food_name)
+    
+    # Convert the nested dictionary to a formatted list
+    formatted_list = []
+    for main_cat, sub_cats in formatted_data.items():
+        main_category = {
+            "main_category": main_cat,
+            "sub_categories": []
+        }
+        
+        for sub_cat, foods in sub_cats.items():
+            sub_category = {
+                "name": sub_cat,
+                "foods": foods
+            }
+            main_category["sub_categories"].append(sub_category)
+        
+        formatted_list.append(main_category)
+    
+    return formatted_list
+
 def recommend_food(deficiencies, category=None):
     """Recommend food items based on a user's nutrient deficiencies, with optional category filtering."""
     df, knn = load_data()
@@ -42,44 +89,7 @@ def recommend_food(deficiencies, category=None):
         recommended_items = recommended_items[recommended_items['main_category'] == category]
     
     if recommended_items.empty:
-        return f"No valid food recommendations available for the selected category: {category}"
+        return {"error": f"No valid food recommendations available for the selected category: {category}"}
     
-    # Format recommendations as a list of strings
-    recommendation_list = [f"\nRecommendations for {' and '.join(deficiencies)} Deficiency:"]
-    #for _, row in recommended_items.iterrows():
-        #recommendation_list.append(
-        #    f"Food: {row['description']}, {', '.join([f'{d.capitalize()}: {row[d]} mg' for d in deficiencies])}"
-        #)
-        #recommendation_list.append(f"\n{row['description']}")
-        
-    
-    #print(recommendation_list)
-
-    #return "\n".join(recommendation_list)
-    grouped_recommendations = {}
-
-# Iterate over each row in the DataFrame
-    for _, row in recommended_items.iterrows():
-        sub_category = row['sub_category']  # Get the sub-category
-        food = row['description']  # Get the food description
-
-    # If sub-category is not in the dictionary, create a new entry
-        if sub_category not in grouped_recommendations:
-            grouped_recommendations[sub_category] = []
-
-    # Append the food to the list of the sub-category
-        grouped_recommendations[sub_category].append(food)
-
-    recommendation_list = []
-
-    for sub_category, foods in grouped_recommendations.items():
-    # Add the sub-category title
-        recommendation_list.append(f"\n {sub_category}")
-    
-    # Add each food under the sub-category
-        for food in foods:
-            recommendation_list.append(f"  - {food}")
-
-# Print the formatted recommendations list
-    print("\n".join(recommendation_list))
-    return "\n".join(recommendation_list)
+    formatted_recommendations = format_recommendations(recommended_items)
+    return formatted_recommendations

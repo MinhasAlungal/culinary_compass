@@ -1,44 +1,93 @@
-### Import libraries
-import pandas as pd 
-import matplotlib.pyplot as plt
-import seaborn as sns
 import streamlit as st
-from datetime import date
-import requests
+import pandas as pd
 
+# Set page config must be the first Streamlit command
+st.set_page_config(page_title="Recipe Recommendations", layout="wide")
 
-st.title("Recipes Based On User Preferences")
-# Load the dataset
-df =pd.read_csv("data/preprocessed/recipes.csv")
+def recipes_recommendation_sidebar():
+    """Display recipe recommendations based on user preferences."""
+    try:
+        st.title("Recipe Recommendations")
+        
+        # Initialize session state if not already done
+        if "user_data" not in st.session_state:
+            st.session_state.user_data = {}
+        if "recommended_foods" not in st.session_state:
+            st.session_state.recommended_foods = []
+        
+        # Load the dataset for sliders
+        df = pd.read_csv("data/preprocessed/recipes.csv")
+        
+        # Recipe preferences in sidebar
+        st.sidebar.write('Select Preferences')
+        calories = st.sidebar.slider('Calories', 
+                                   min_value=df['Calories'].min(), 
+                                   max_value=df['Calories'].max())
+        fat = st.sidebar.slider('Fat', 
+                              min_value=df['FatContent'].min(), 
+                              max_value=df['FatContent'].max())
+        saturated_fat = st.sidebar.slider('Saturated Fat',
+                                        min_value=df['SaturatedFatContent'].min(),
+                                        max_value=df['SaturatedFatContent'].max())
+        cholesterol = st.sidebar.slider('Cholesterol',
+                                      min_value=df['CholesterolContent'].min(),
+                                      max_value=df['CholesterolContent'].max())
+        sodium = st.sidebar.slider('Sodium',
+                                 min_value=df['SodiumContent'].min(),
+                                 max_value=df['SodiumContent'].max())
+        carbohydrate = st.sidebar.slider('Carbohydrate',
+                                       min_value=df['CarbohydrateContent'].min(),
+                                       max_value=df['CarbohydrateContent'].max())
+        fiber = st.sidebar.slider('Fiber',
+                                min_value=df['FiberContent'].min(),
+                                max_value=df['FiberContent'].max())
+        sugar = st.sidebar.slider('Sugar',
+                                min_value=df['SugarContent'].min(),
+                                max_value=df['SugarContent'].max())
+        protein = st.sidebar.slider('Protein',
+                                  min_value=df['ProteinContent'].min(),
+                                  max_value=df['ProteinContent'].max())
 
+        # Check if we have valid user data in session state
+        if not st.session_state.user_data or not st.session_state.recommended_foods:
+            print("Missing session state data")
+            print("user_data in session:", bool(st.session_state.user_data))
+            print("recommended_foods in session:", bool(st.session_state.recommended_foods))
+            st.warning("Please get food recommendations first!")
+            if st.button("Go to Food Recommendations"):
+                st.switch_page("pages/food_recommendation.py")
+            return
 
-# Now display the DataFrame
-st.write(df.head(5))
+        # Display user data
+        st.subheader("Your Profile")
+        user_data = st.session_state.user_data
+        st.write(f"**Name:** {user_data.get('name', 'Not provided')}")
+        st.write(f"**BMI:** {user_data.get('bmi', 'Not provided')} ({user_data.get('bmi_category', 'Not provided')})")
+        st.write(f"**Diet Preference:** {user_data.get('food_preference', 'Not provided')}")
+        if user_data.get('deficiencies'):
+            st.write(f"**Deficiencies:** {', '.join(user_data['deficiencies'])}")
 
+        # Display recommended foods
+        st.subheader("Recommended Foods")
+        recommended_foods = st.session_state.recommended_foods
+        
+        # Display each main category and its foods
+        for main_cat in recommended_foods:
+            st.header(f"📍 {main_cat['main_category']}")
+            
+            for sub_cat in main_cat['sub_categories']:
+                with st.expander(f"🔹 {sub_cat['name']} ({len(sub_cat['foods'])} items)"):
+                    for food in sub_cat['foods']:
+                        st.markdown(f"• {food}")
+                st.markdown("---")
 
+        # Navigation
+        if st.button("← Back to Food Recommendations"):
+            st.switch_page("pages/food_recommendation.py")
 
-# Let's add a sidebar for navigation and the page names
+    except Exception as e:
+        print(f"Error in recipes_recommendation_sidebar: {str(e)}")
+        st.error("An unexpected error occurred. Please try again.")
 
-#st.sidebar.page_link(page='pages/food_recommendation.py',label='Food Recommendation', icon='📊')
-#st.sidebar.page_link(page='deficiency_EDA.py', label='Recipe Selection',icon ='💡')
-#st.sidebar.write('---')
-
-# Getting user preferences
-st.sidebar.write('Select Preferences')
-
-calories = st.sidebar.slider(label='Calories', min_value= df['Calories'].min(), max_value= df['Calories'].max())
-Fat = st.sidebar.slider(label='Fat', min_value= df['FatContent'].min(), max_value= df['FatContent'].max())
-Saturated_fat = st.sidebar.slider(label='Saturated Fat',min_value= df['SaturatedFatContent'].min(), max_value= df['SaturatedFatContent'].max())
-Cholesterol = st.sidebar.slider(label='Cholesterol',min_value= df['CholesterolContent'].min(), max_value= df['CholesterolContent'].max())
-Sodium = st.sidebar.slider(label='Sodium', min_value= df['SodiumContent'].min(), max_value= df['SodiumContent'].max())
-Carbohydrate = st.sidebar.slider(label='Carbohydrate',min_value= df['CarbohydrateContent'].min(), max_value= df['CarbohydrateContent'].max())
-Fiber = st.sidebar.slider(label='Fiber',min_value= df['FiberContent'].min(), max_value= df['FiberContent'].max())
-Sugar = st.sidebar.slider(label='Sugar',min_value= df['SugarContent'].min(), max_value= df['SugarContent'].max())
-Protein = st.sidebar.slider(label='Protein',min_value= df['ProteinContent'].min(), max_value= df['ProteinContent'].max())
-
-# Get data from session state
-user_data = st.session_state.user_data
-recommended_foods = st.session_state.recommended_foods
-
-st.write(user_data)
-st.write(recommended_foods)
+if __name__ == "__main__":
+    recipes_recommendation_sidebar()
