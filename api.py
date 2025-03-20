@@ -53,7 +53,6 @@ async def get_recommendation(data: RecommendationRequest):
 
 @app.post("/save-history/")
 async def save_history(user_history: UserHistory):
-    # file_path = "data/user_log/food.xlsx"
 
     try:
         history_dict = user_history.model_dump()
@@ -69,7 +68,7 @@ async def save_history(user_history: UserHistory):
                 new_data.to_excel(HISTORY_FILE, index=False)  # Write with headers
             else:
                 with pd.ExcelWriter(HISTORY_FILE, mode='a', if_sheet_exists='overlay', engine="openpyxl") as writer:
-                    sheet = writer.sheets['Sheet1']
+                    sheet = writer.sheets[SHEET_NAME]
                     new_data.to_excel(writer, index=False, header=False, startrow=sheet.max_row)
 
         return {"message": "History saved successfully"}
