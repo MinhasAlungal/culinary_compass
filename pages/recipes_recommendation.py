@@ -25,18 +25,23 @@ def recipes_recommendation_sidebar():
         st.write("### Please select your dietary preferences and adjust the sliders for nutritional values before clicking 'Find Recipes'.")
 
         # Ensure session state has necessary data
-        if "user_data" not in st.session_state or "recommended_foods" not in st.session_state:
+        if "user_data" not in st.session_state or "selected_foods" not in st.session_state:
             st.warning("Please get food recommendations first!")
             if st.button("Go to Food Recommendations"):
                 st.switch_page("pages/food_recommendation.py")
             return
-
+        
         # Load dataset for slider min-max values
         df = pd.read_csv("data/preprocessed/recipes.csv")
 
         # Diet Preference from previous page input
         user_data = st.session_state['user_data']
+        st.write(user_data)
         diet_preference = user_data.get('food_preference', None)
+
+        ############ to be deleted
+        selected_foods= st.session_state['selected_foods']
+        st.write(selected_foods)
 
         # Nutrient sliders
         user_nutrients = {
@@ -52,11 +57,8 @@ def recipes_recommendation_sidebar():
         }
 
         # Get user ingredients from session state
-        user_ingredients = []
-        for main_cat in st.session_state.recommended_foods:
-            for sub_cat in main_cat['sub_categories']:
-                user_ingredients.extend(sub_cat['foods'])
-
+        user_ingredients = st.session_state.selected_foods
+       
         # Print out the ingredients for debugging purposes
         st.write("### User Ingredients:")
         st.write(user_ingredients)
@@ -101,28 +103,28 @@ def recipes_recommendation_sidebar():
                 st.write("**Instructions**: " + str(recipe.get('RecipeInstructions', 'N/A')))
 
                 # Handle image URLs
-                image_url = recipe.get('Images', '')
-                if image_url:
-                    # If the image URL is a string and it starts with c("...), we need to split it
-                    if isinstance(image_url, str):
-                        if image_url.startswith('c("'):
-                            image_urls = extract_image_urls(image_url)
-                            for img_url in image_urls:
-                                if img_url:
-                                    st.image(img_url, use_container_width=True)
-                        elif image_url.startswith("http"):
-                            # If it's a valid URL
-                            st.image(image_url, use_container_width=True)
-                        else:
-                            st.warning("Invalid image URL format.")
-                    elif isinstance(image_url, list):
-                        for img_url in image_url:
-                            if img_url:
-                                st.image(img_url, use_container_width=True)
-                    else:
-                        st.warning("No valid image found.")
-                else:
-                    st.warning("No image available for this recipe.")
+                # image_url = recipe.get('Images', '')
+                # if image_url:
+                #     # If the image URL is a string and it starts with c("...), we need to split it
+                #     if isinstance(image_url, str):
+                #         if image_url.startswith('c("'):
+                #             image_urls = extract_image_urls(image_url)
+                #             for img_url in image_urls:
+                #                 if img_url:
+                #                     st.image(img_url, use_container_width=True)
+                #         elif image_url.startswith("http"):
+                #             # If it's a valid URL
+                #             st.image(image_url, use_container_width=True)
+                #         else:
+                #             st.warning("Invalid image URL format.")
+                #     elif isinstance(image_url, list):
+                #         for img_url in image_url:
+                #             if img_url:
+                #                 st.image(img_url, use_container_width=True)
+                #     else:
+                #         st.warning("No valid image found.")
+                # else:
+                #     st.warning("No image available for this recipe.")
 
                 st.markdown("---")
 
