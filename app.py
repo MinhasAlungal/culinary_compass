@@ -1,7 +1,6 @@
 """
     This python script is related to the Eda part of our Streamlit Web App.
 """
-
 ### Import libraries
 import pandas as pd
 import matplotlib.pyplot as plt

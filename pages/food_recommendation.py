@@ -90,7 +90,8 @@ def save_to_api(user_data: dict, recommendation: list):
 def main():
     """Main function to run the Streamlit app."""
     st.set_page_config(page_title="Food Recommendation System", layout="wide")
-    st.title("Food Recommendation System")
+    st.title("Culinary Compass : Flavor Meets Wellness")
+    
     
     # Clear session state when the page is loaded
     if 'user_data' not in st.session_state:
@@ -194,7 +195,24 @@ def main():
         save_to_api(st.session_state['user_data'], recommendation)
 
     # Display User Info and Recommendations if available
-    if st.session_state['user_data']:
+    if not st.session_state['user_data']:
+        st.markdown(
+                """
+                <div style="
+                    padding: 10px; 
+                    background-color: #ffebcc; 
+                    border-radius: 5px;
+                    border-left: 5px solid #ff9800;
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #8a6d3b;">
+                     Enter details & select deficiency to get recommendations.
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        st.image("assets/wellness.jpg", caption="Flavor meets wellness!", use_container_width=True)
+    else: 
         user_data = st.session_state['user_data']
         st.subheader(f"Hello, {user_data['name']}!")
         st.write(f"**Age:** {user_data['age']}  |  **Gender:** {user_data['gender']}")
@@ -206,7 +224,7 @@ def main():
         if st.session_state['recommendation']:
             st.subheader("Here's your food recommendation:")
             for category in st.session_state['recommendation']:
-                st.markdown(f"### {category['main_category']}")  # Main category as header
+                #st.markdown(f"### {category['main_category']}")  # Main category as header
                 for sub_cat in category['sub_categories']:
                     with st.expander(f"**{sub_cat['name']}** ({len(sub_cat['foods'])} items)"):
                         # Split into two columns    
@@ -236,7 +254,7 @@ def main():
 
     # Footer
     st.markdown("---")
-    st.caption(f"Food Recommendation System | {date.today().year}")
+    st.caption(f"Culinary Compass : Flavor Meets Wellness | {date.today().year}")
 
 def clear_session():
     st.session_state['user_data'] = None
