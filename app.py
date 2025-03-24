@@ -8,6 +8,13 @@ import seaborn as sns
 import plotly.express as px
 # this is how we import streamlit
 import streamlit as st
+
+from utils.torch_setup import setup_torch
+
+# Call this at the start of your application
+setup_torch()
+
+
 st.title("Lets Explore the Deficiency Data")
 # Reading the data
 df=pd.read_excel("data/EDA/deficiency_data.xlsx")

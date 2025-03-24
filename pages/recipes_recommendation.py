@@ -1,11 +1,13 @@
+# Set page config must be the very first Streamlit command
 import streamlit as st
+st.set_page_config(page_title="Recipe Recommendations", layout="wide")
+
+# All other imports come after
 import pandas as pd
 import matplotlib.pyplot as plt
 import re
-from scripts.recipes_recommend import recommend_recipes
-
-# Set page config
-st.set_page_config(page_title="Recipe Recommendations", layout="wide")
+from utils.model_setup import get_model
+from scripts.recipes_recommend import load_data, recommend_recipes
 
 def extract_image_urls(image_str):
     """Extract image URLs from the 'c(\"...\")' format."""
@@ -43,6 +45,11 @@ def show_nutrition_chart(recipe):
 def recipes_recommendation_sidebar():
     """Display recipe recommendations based on user preferences."""
     try:
+        model = get_model()
+        if model is None:
+            st.error("Failed to load the recommendation model")
+            return
+
         st.title(" 🍽️ Discover Your Personalized Recipes")
 
         if "user_data" not in st.session_state or "selected_foods" not in st.session_state:

@@ -3,6 +3,10 @@ import pandas as pd
 import torch
 from sentence_transformers import SentenceTransformer, util
 import pickle
+from utils.model_setup import get_model
+
+from utils.torch_setup import setup_torch
+setup_torch()
 
 # Set device (CPU or GPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -27,8 +31,11 @@ def load_data():
 
     return df, model_st
 
-def recommend_recipes(nutrients, ingredients, diet_preference):
-    """Recommend recipes based on user nutrients, ingredients, and dietary preference."""
+def recommend_recipes(user_nutrients, user_ingredients, diet_preference):
+    model = get_model()
+    if model is None:
+        return []
+
     df, model_st = load_data()
 
     # Filter by dietary preference
@@ -38,7 +45,7 @@ def recommend_recipes(nutrients, ingredients, diet_preference):
         df_filtered = df.copy()
 
     # Encode input ingredients and move them to the same device
-    input_embedding = model_st.encode(" ".join(ingredients), convert_to_tensor=True).to(device)
+    input_embedding = model_st.encode(" ".join(user_ingredients), convert_to_tensor=True).to(device)
 
     # Stack ingredient embeddings and move to the same device
     ingredient_embeddings = torch.stack(df_filtered["IngredientEmbedding"].tolist()).to(device)
@@ -51,7 +58,7 @@ def recommend_recipes(nutrients, ingredients, diet_preference):
                         "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"]
     
     df_nutrients = df_filtered[nutrient_columns].fillna(0).to_numpy()
-    input_nutrient_array = np.array([nutrients[col] for col in nutrient_columns]).reshape(1, -1)
+    input_nutrient_array = np.array([user_nutrients[col] for col in nutrient_columns]).reshape(1, -1)
 
     nutrient_distances = np.linalg.norm(df_nutrients - input_nutrient_array, axis=1)
     nutrient_similarities = 1 / (1 + nutrient_distances)
