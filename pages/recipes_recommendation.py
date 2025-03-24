@@ -61,15 +61,15 @@ def recipes_recommendation_sidebar():
 
         # Nutrient sliders
         user_nutrients = {
-            "Calories": st.sidebar.slider('Calories', float(df['Calories'].min()), float(df['Calories'].max()), float(df['Calories'].mean()), step=0.1),
-            "FatContent": st.sidebar.slider('Fat', float(df['FatContent'].min()), float(df['FatContent'].max()), float(df['FatContent'].mean()), step=0.1),
-            "SaturatedFatContent": st.sidebar.slider('Saturated Fat', float(df['SaturatedFatContent'].min()), float(df['SaturatedFatContent'].max()), float(df['SaturatedFatContent'].mean()), step=0.1),
-            "CholesterolContent": st.sidebar.slider('Cholesterol', float(df['CholesterolContent'].min()), float(df['CholesterolContent'].max()), float(df['CholesterolContent'].mean()), step=0.1),
-            "SodiumContent": st.sidebar.slider('Sodium', float(df['SodiumContent'].min()), float(df['SodiumContent'].max()), float(df['SodiumContent'].mean()), step=0.1),
-            "CarbohydrateContent": st.sidebar.slider('Carbohydrate', float(df['CarbohydrateContent'].min()), float(df['CarbohydrateContent'].max()), float(df['CarbohydrateContent'].mean()), step=0.1),
-            "FiberContent": st.sidebar.slider('Fiber', float(df['FiberContent'].min()), float(df['FiberContent'].max()), float(df['FiberContent'].mean()), step=0.1),
-            "SugarContent": st.sidebar.slider('Sugar', float(df['SugarContent'].min()), float(df['SugarContent'].max()), float(df['SugarContent'].mean()), step=0.1),
-            "ProteinContent": st.sidebar.slider('Protein', float(df['ProteinContent'].min()), float(df['ProteinContent'].max()), float(df['ProteinContent'].mean()), step=0.1),
+            "Calories": st.sidebar.slider('Calories', float(df['Calories'].min()), float(df['Calories'].max()), float(df['Calories'].min()), step=0.1),
+            "FatContent": st.sidebar.slider('Fat', float(df['FatContent'].min()), float(df['FatContent'].max()), float(df['FatContent'].min()), step=0.1),
+            "SaturatedFatContent": st.sidebar.slider('Saturated Fat', float(df['SaturatedFatContent'].min()), float(df['SaturatedFatContent'].max()), float(df['SaturatedFatContent'].min()), step=0.1),
+            "CholesterolContent": st.sidebar.slider('Cholesterol', float(df['CholesterolContent'].min()), float(df['CholesterolContent'].max()), float(df['CholesterolContent'].min()), step=0.1),
+            "SodiumContent": st.sidebar.slider('Sodium', float(df['SodiumContent'].min()), float(df['SodiumContent'].max()), float(df['SodiumContent'].min()), step=0.1),
+            "CarbohydrateContent": st.sidebar.slider('Carbohydrate', float(df['CarbohydrateContent'].min()), float(df['CarbohydrateContent'].max()), float(df['CarbohydrateContent'].min()), step=0.1),
+            "FiberContent": st.sidebar.slider('Fiber', float(df['FiberContent'].min()), float(df['FiberContent'].max()), float(df['FiberContent'].min()), step=0.1),
+            "SugarContent": st.sidebar.slider('Sugar', float(df['SugarContent'].min()), float(df['SugarContent'].max()), float(df['SugarContent'].min()), step=0.1),
+            "ProteinContent": st.sidebar.slider('Protein', float(df['ProteinContent'].min()), float(df['ProteinContent'].max()), float(df['ProteinContent'].min()), step=0.1),
         }
 
         if st.sidebar.button("Find Recipes"):

@@ -11,11 +11,17 @@ def load_data():
     """Load processed food data and extract unique categories."""
     df = pd.read_csv("data/preprocessed/food.csv")
     categories = df["main_category"].unique().tolist()
+    # deficiencies = [
+    #     'calcium', 'potassium', 'zinc', 'vitamin_C', 'iron', 'magnesium', 
+    #     'phosphorus', 'sodium', 'copper', 'vitamin_E', 'thiamin', 'riboflavin', 
+    #     'cholesterol', 'Niacin', 'vitamin_B_6', 'choline_total', 'vitamin_A', 
+    #     'vitamin_K', 'folate_total', 'vitamin_B_12', 'selenium', 'vitamin_D'
+    # ]
+
     deficiencies = [
-        'calcium', 'potassium', 'zinc', 'vitamin_C', 'iron', 'magnesium', 
-        'phosphorus', 'sodium', 'copper', 'vitamin_E', 'thiamin', 'riboflavin', 
-        'cholesterol', 'Niacin', 'vitamin_B_6', 'choline_total', 'vitamin_A', 
-        'vitamin_K', 'folate_total', 'vitamin_B_12', 'selenium', 'vitamin_D'
+        'vitamin_D', 'calcium', 'iron', 'vitamin_C', 'vitamin_B_12', 
+        'Niacin', 'vitamin_B_6', 'vitamin_A', 'magnesium', 'riboflavin', 
+        'zinc', 'sodium','vitamin_E', 'vitamin_K', 'potassium', 'folate_total'
     ]
     return df, categories, deficiencies
 
@@ -39,6 +45,7 @@ def get_recommendation(preference, deficiencies):
             json={"food_preference": preference, "deficiencies": deficiencies},
             timeout=5
         )
+        st.write(response.json()["recommendation"])
         if response.status_code == 200:
             return response.json()["recommendation"]
         else:
