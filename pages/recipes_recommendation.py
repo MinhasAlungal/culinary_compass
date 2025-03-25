@@ -57,7 +57,7 @@ def show_nutrition_pie_chart(recipe):
         values,
         colors=colors[:len(values)],
         autopct=lambda pct: f'{pct:.1f}%' if pct > 5 else '',  # Only show percentage if > 5%
-        pctdistance=0.85,
+        pctdistance=0.75,
         startangle=90,
         wedgeprops={
             'width': 0.7,             # Create a donut chart effect
@@ -332,32 +332,47 @@ def recipes_recommendation_sidebar():
             #st.info("ℹ️ Please select your dietary preference - adjust the sliders, and click 'Find Recipes' to see recommendations.")
         else:
             for idx, recipe in enumerate(recommended_recipes):
-                with st.expander(f"🍽️ {recipe.get('Name', 'Unknown Recipe')} ({str(recipe.get('DietaryCategory', 'N/A'))})"):
+                with st.expander(f" {recipe.get('Name', 'Unknown Recipe')} ({str(recipe.get('DietaryCategory', 'N/A'))})"):
                     col1, col2 = st.columns([3, 2])
 
                     with col1:
-                        # st.write("**Dietary Category**: " + str(recipe.get('DietaryCategory', 'N/A')))
-                        # st.write("**Cook Time**: " + str(recipe.get('CookTime', 'N/A')))
-                        # st.write("**Recipe Category**: " + str(recipe.get('RecipeCategory', 'N/A')))
-                        # st.write("**Ingredients**: " + str(recipe.get('RecipeIngredientParts', 'N/A')))
-                        # st.write("**Keywords**: " + str(recipe.get('Keywords', 'N/A')))
-                        # st.write("**Calories**: " + str(recipe.get('Calories', 'N/A')))
-                        # st.write("**Fat Content**: " + str(recipe.get('FatContent', 'N/A')))
-                        # st.write("**Saturated Fat**: " + str(recipe.get('SaturatedFatContent', 'N/A')))
-                        # st.write("**Cholesterol**: " + str(recipe.get('CholesterolContent', 'N/A')))
-                        # st.write("**Sodium**: " + str(recipe.get('SodiumContent', 'N/A')))
-                        # st.write("**Carbohydrates**: " + str(recipe.get('CarbohydrateContent', 'N/A')))
-                        # st.write("**Fiber**: " + str(recipe.get('FiberContent', 'N/A')))
-                        # st.write("**Sugar**: " + str(recipe.get('SugarContent', 'N/A')))
-                        # st.write("**Protein**: " + str(recipe.get('ProteinContent', 'N/A')))
-                        # # st.write("**Instructions**: " + str(recipe.get('RecipeInstructions', 'N/A')))
                         ingredients = recipe.get('RecipeIngredientParts', 'N/A')
                         display_recipe_ingredients(ingredients)
                         instructions = recipe.get('RecipeInstructions', 'N/A')
                         display_recipe_instructions(instructions)
 
-                        # Checkbox for nutrition chart
-                        show_chart = st.checkbox(f"📊 View Nutrition Chart for {recipe['Name']}", key=f"chart_{idx}")
+                        # Add the CSS styling
+                        st.markdown("""
+                            <style>
+                            .chart-toggle {
+                                background-color: #f8f9fa;
+                                padding: 10px 15px;
+                                border-radius: 6px;
+                                border: 1px solid #e9ecef;
+                                margin: 10px 0;
+                            }
+                            .chart-toggle .stCheckbox {
+                                font-size: 14px !important;
+                            }
+                            .chart-toggle .stCheckbox label {
+                                color: #2c3e50 !important;
+                                font-weight: 500 !important;
+                            }
+                            .chart-toggle .stCheckbox label:hover {
+                                color: #4a90e2 !important;
+                            }
+                            .chart-toggle input[type="checkbox"] {
+                                transform: scale(1.1);
+                            }
+                            </style>
+                        """, unsafe_allow_html=True)
+
+                        # Create the checkbox directly without extra container wrapping
+                        show_chart = st.checkbox(
+                            f"📊 View Nutrition Chart for {recipe['Name']}", 
+                            key=f"chart_{idx}",
+                            help="Click to view detailed nutrition information"  # Optional tooltip
+                        )
 
                     with col2:
                         if show_chart:
