@@ -58,8 +58,16 @@ def save_to_api(user_data: dict, recommendation: list):
             for sub_cat in main_cat['sub_categories']:
                 recommendation_str += f"{sub_cat['name']}\n"
                 for food in sub_cat['foods']:
-                    recommendation_str += f"  - {food}\n"
-        
+                    food_name = food['food_name']
+                    nutrients = food['nutrients']
+            
+                    # Format nutrient values as a comma-separated string
+                    nutrient_str = ", ".join([f"{key}: {value}" for key, value in nutrients.items()])
+            
+                    # Append food name with its nutrients
+                    recommendation_str += f"  - {food_name} ({nutrient_str})\n"
+                    #recommendation_str += f"  - {food}\n"
+                    
         # Prepare data to match UserHistory model
         history_data = {
             "name": str(user_data['name']),
@@ -221,26 +229,40 @@ def main():
         if user_data['deficiencies']:
             st.write(f"**Selected Deficiencies:** {', '.join(user_data['deficiencies'])}")
 
+
         if st.session_state['recommendation']:
             st.subheader("Here's your food recommendation:")
             for category in st.session_state['recommendation']:
                 #st.markdown(f"### {category['main_category']}")  # Main category as header
                 for sub_cat in category['sub_categories']:
                     with st.expander(f"**{sub_cat['name']}** ({len(sub_cat['foods'])} items)"):
-                        # Split into two columns    
+                    # Split into two columns    
                         col1, col2 = st.columns(2)
-                        unique_foods = list(set(sub_cat["foods"]))
+                        unique_foods = list(set(food["food_name"] for food in sub_cat["foods"]))
 
-                        # Display food items as checkboxes
-                        for i, food in enumerate(unique_foods):
+                        # Display food items with nutrients and checkbox in the same loop
+                        for i, food_name in enumerate(unique_foods):
                             col = col1 if i % 2 == 0 else col2  
-                            selected = col.checkbox(food, key=f"food_{food}", value=food in st.session_state["selected_foods"])
-                            # Update session state based on user selection
-                            if selected:
-                                st.session_state["selected_foods"].add(food)
-                            else:
-                                st.session_state["selected_foods"].discard(food)
 
+                        # Now display the food name and its nutrients
+                            for food in sub_cat["foods"]:
+                                if food["food_name"] == food_name:
+                                    nutrient_values = food["nutrients"]
+                                    nutrient_str = ", ".join([f"{nutrient}: {value}" for nutrient, value in nutrient_values.items()])
+                                    # Display food name and nutrients **before the checkbox**
+                                    #st.write(f"**{food_name}:** {nutrient_str}")
+
+                        # Display checkbox for selecting food
+                            selected = col.checkbox(food_name + ' ' + nutrient_str,key=f"food_{food_name}", value=food_name in st.session_state["selected_foods"])
+
+                    # Update session state based on user selection
+                            if selected:
+                                st.session_state["selected_foods"].add(food_name)
+                            else:
+                                st.session_state["selected_foods"].discard(food_name)
+
+        
+                            
             # Show selected foods
             st.subheader("Your Selected Foods:")
             if st.session_state["selected_foods"]:
