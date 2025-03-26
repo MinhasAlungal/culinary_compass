@@ -30,6 +30,9 @@ nutrients = ['calcium', 'potassium', 'zinc', 'vitamin_C', 'iron', 'magnesium', '
               'vitamin_E', 'thiamin', 'riboflavin', 'cholesterol', 'Niacin', 'vitamin_B_6', 'choline_total',
               'vitamin_A', 'vitamin_K', 'folate_total', 'vitamin_B_12', 'selenium', 'vitamin_D' ]
 
+df.to_csv("data/original/food.csv",index=False) # saving after column names have changed
+#print(df.columns)
+
 # Normalize nutrient data using MinMaxScaler
 scaler = MinMaxScaler()
 df[nutrients] = scaler.fit_transform(df[nutrients])
