@@ -1,10 +1,17 @@
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
+import re
 
 # Load data
 df = pd.read_excel("data/food_data.xlsx")
 df.rename(columns={'vitamin_K_ UG': 'vitamin_K_UG', 'vitamin D _UG' : 'vitamin_D_UG', 'vitamin B_12_UG' : 'vitamin_B_12_UG'}, inplace=True)
 df.fillna(0, inplace=True)
+
+# Cleaning
+df['description'] = df['description'].apply(lambda x: x[:-5] if x.endswith(", raw") else x)
+df['main_category'] = df['main_category'].apply(lambda x: "Veg" if x == "Non Alcoholic" else x)
+df['description'] = df['description'].apply(lambda x: re.sub(r"^Game meat,\s*", "", x).capitalize())
+
 
 
 in_mg = ['calcium_MG', 'potassium_MG', 'zinc_MG', 'vitamin_C_MG', 'iron_MG', 'magnesium_MG', 'phosphorus_MG',
