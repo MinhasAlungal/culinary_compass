@@ -176,7 +176,7 @@ def display_recipe_instructions(instructions):
         }
         /* Container styling */
         .recipe-steps-container {
-            max-height: 300px;
+            max-height: 250px;
             overflow-y: auto;
             border: 1px solid #f0f2f6;
             border-radius: 0.5rem;
@@ -238,7 +238,6 @@ def display_recipe_ingredients(ingredients):
             background-color: #ffffff;
             padding: 5px;
             border-radius: 5px;
-            margin-bottom: 5px;
         }
         .ingredients-header {
             color: #2c3e50;
@@ -296,6 +295,71 @@ def display_recipe_ingredients(ingredients):
     
     st.markdown("</div></div>", unsafe_allow_html=True)
 
+def display_selected_foods(selected_foods):
+    """
+    Display selected foods in styled capsules within a scrollable container
+    """
+    st.markdown("""
+        <style>
+            .selected-foods-container {
+                max-height: 200px;
+                overflow-y: auto;
+                border: 1px solid #f0f2f6;
+                border-radius: 0.5rem;
+                padding: 0.5rem;
+                background-color: white;
+                margin: 0.3rem 0;
+                scrollbar-width: thin;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            .selected-foods-container::-webkit-scrollbar {
+                width: 6px;
+                background-color: #f0f2f6;
+            }
+            .selected-foods-container::-webkit-scrollbar-thumb {
+                background-color: #ccc;
+                border-radius: 3px;
+            }
+            .selected-foods-header {
+                display: flex;
+                font-size: 1rem;
+                font-weight: 600;
+                font-size: 1.3em;
+                font-weight: bold;
+                color: #262730;
+            }
+            .food-capsule {
+                display: inline-flex;
+                align-items: center;
+                font-size: 0.85rem;
+                color: #262730;
+                background-color: #d7ccc8;
+                border-radius: 1rem;
+                padding: 0.35rem 0.8rem;
+                font-family: 'Source Sans Pro', sans-serif;
+                transition: all 0.2s;
+            }
+            .food-capsule:hover {
+                background-color: #e1e4eb;
+                transform: translateY(-1px);
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Display header
+    st.markdown('<div class="selected-foods-header">Selected Foods:</div>', unsafe_allow_html=True)
+    
+    # Create container with capsule items
+    foods_html = '<div class="selected-foods-container">'
+    for food in selected_foods:
+        foods_html += f'<div class="food-capsule">{food}</div>'
+    foods_html += '</div>'
+
+    # Display the container
+    st.markdown(foods_html, unsafe_allow_html=True)
+
 def recipes_recommendation_sidebar():
     """Display recipe recommendations based on user preferences."""
     try:
@@ -308,6 +372,10 @@ def recipes_recommendation_sidebar():
                 st.switch_page("pages/food_recommendation.py")
             return
         
+        # display the selected foods from the food recommendation page 
+        if 'selected_foods' in st.session_state:
+            display_selected_foods(st.session_state.selected_foods)
+
         # Load dataset for slider min-max values
         df = pd.read_csv("data/preprocessed/recipes.csv")
 
