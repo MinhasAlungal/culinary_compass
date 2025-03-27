@@ -7,6 +7,38 @@ from scripts.recipes_recommend import recommend_recipes
 # Set page config
 st.set_page_config(page_title="Recipe Recommendations", layout="wide")
 
+# Add this CSS for the page header
+st.markdown("""
+    <style>
+        .main > div:first-child {
+            padding-top: 0.5rem !important;
+        }
+        .block-container {
+            padding-top: 1.25rem !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+        }
+        h1 {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        /* Style for the header container */
+        .header-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            margin: 0;
+            
+        }
+        /* Style for the header icon */
+        .header-icon {
+            font-size: 2rem;
+            margin-right: 0.5rem;
+        }   
+    </style>
+""", unsafe_allow_html=True)
+
 def extract_image_urls(image_str):
     """Extract image URLs from the 'c(\"...\")' format."""
     if isinstance(image_str, str):
@@ -363,7 +395,12 @@ def display_selected_foods(selected_foods):
 def recipes_recommendation_sidebar():
     """Display recipe recommendations based on user preferences."""
     try:
-        st.title(" 🍽️ Discover Your Personalized Recipes")
+        st.markdown("""
+            <div class="header-container">
+                <span class="header-icon">🍽️</span>
+                <h1>Discover Your Personalized Recipes</h1>
+            </div>
+        """, unsafe_allow_html=True)
 
         if "user_data" not in st.session_state or "selected_foods" not in st.session_state:
             st.warning("Please get food recommendations first!")
