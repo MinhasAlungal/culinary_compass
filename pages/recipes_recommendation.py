@@ -128,29 +128,43 @@ def format_recipe_instructions(instructions_str):
     return steps
 
 def display_recipe_instructions(instructions):
-    """Display recipe instructions with beautiful formatting."""
+    """Display recipe instructions with beautiful formatting in a scrollable container."""
     st.markdown("""
         <style>
+        /* Step styling */
         .recipe-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 5px;
+            padding: 0.5rem;
             background-color: #f8f9fa;
-            border-left: 4px solid #28a745;
-            margin: 4px 0;
-            padding: 5px;
-            border-radius: 6px;
+            border-radius: 0.25rem;
+            border-left: 2px solid #28a745;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
-            font-size: 0.9em;
-            font-weight: 500;
         }
         .recipe-step:hover {
             transform: translateX(5px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+        
+        /* Number and text styling */
         .step-number {
-            color: #28a745;
-            font-size: 1.1em;
-            margin-right: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-right: 0.5rem;
+            color: #262730;
+            min-width: 0.75;
         }
+        .step-text {
+            color: #262730;
+            flex: 1;
+            line-height: 1.5;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        /* Header styling */
         .instruction-header {
             color: #2c3e50;
             font-size: 1.3em;
@@ -158,10 +172,27 @@ def display_recipe_instructions(instructions):
             display: flex;
             align-items: center;
             gap: 8px;
+            margin-bottom: 10px;
         }
-        .step-text {
-            line-height: 1;
-            color: #2c3e50;
+        /* Container styling */
+        .recipe-steps-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #f0f2f6;
+            border-radius: 0.5rem;
+            padding: 8px;
+            background-color: white;
+            scrollbar-width: thin;
+        }
+        
+        /* Scrollbar styling */
+        .recipe-steps-container::-webkit-scrollbar {
+            width: 6px;
+            background-color: #f0f2f6;
+        }
+        .recipe-steps-container::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 3px;
         }
         </style>
         """, unsafe_allow_html=True)
@@ -173,13 +204,15 @@ def display_recipe_instructions(instructions):
         st.write("No instructions available.")
         return
 
+    # Create a single HTML string for all steps with compact formatting
+    steps_html = '<div class="recipe-steps-container">'
     for i, step in enumerate(steps, 1):
-        st.markdown(f"""
-            <div class="recipe-step">
-                <span class="step-number">Step {i}</span>
-                <span class="step-text">{step}</span>
-            </div>
-        """, unsafe_allow_html=True)
+        if step:  # Only add non-empty steps
+            steps_html += f'<div class="recipe-step"><span class="step-number">{i}.</span><span class="step-text">{step}</span></div>'
+    steps_html += '</div>'
+
+    # Display all steps at once in the container
+    st.markdown(steps_html, unsafe_allow_html=True)
 
 def format_recipe_ingredients(ingredients_str):
     """Format recipe ingredients into a clean list."""
