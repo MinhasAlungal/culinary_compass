@@ -7,6 +7,38 @@ from scripts.recipes_recommend import recommend_recipes
 # Set page config
 st.set_page_config(page_title="Recipe Recommendations", layout="wide")
 
+# Add this CSS for the page header
+st.markdown("""
+    <style>
+        .main > div:first-child {
+            padding-top: 0.5rem !important;
+        }
+        .block-container {
+            padding-top: 1.25rem !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+        }
+        h1 {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        /* Style for the header container */
+        .header-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            margin: 0;
+            
+        }
+        /* Style for the header icon */
+        .header-icon {
+            font-size: 2rem;
+            margin-right: 0.5rem;
+        }   
+    </style>
+""", unsafe_allow_html=True)
+
 def extract_image_urls(image_str):
     """Extract image URLs from the 'c(\"...\")' format."""
     if isinstance(image_str, str):
@@ -128,29 +160,43 @@ def format_recipe_instructions(instructions_str):
     return steps
 
 def display_recipe_instructions(instructions):
-    """Display recipe instructions with beautiful formatting."""
+    """Display recipe instructions with beautiful formatting in a scrollable container."""
     st.markdown("""
         <style>
+        /* Step styling */
         .recipe-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 5px;
+            padding: 0.5rem;
             background-color: #f8f9fa;
-            border-left: 4px solid #28a745;
-            margin: 4px 0;
-            padding: 5px;
-            border-radius: 6px;
+            border-radius: 0.25rem;
+            border-left: 2px solid #28a745;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
-            font-size: 0.9em;
-            font-weight: 500;
         }
         .recipe-step:hover {
             transform: translateX(5px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+        
+        /* Number and text styling */
         .step-number {
-            color: #28a745;
-            font-size: 1.1em;
-            margin-right: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-right: 0.5rem;
+            color: #262730;
+            min-width: 0.75;
         }
+        .step-text {
+            color: #262730;
+            flex: 1;
+            line-height: 1.5;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        /* Header styling */
         .instruction-header {
             color: #2c3e50;
             font-size: 1.3em;
@@ -158,10 +204,27 @@ def display_recipe_instructions(instructions):
             display: flex;
             align-items: center;
             gap: 8px;
+            margin-bottom: 10px;
         }
-        .step-text {
-            line-height: 1;
-            color: #2c3e50;
+        /* Container styling */
+        .recipe-steps-container {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #f0f2f6;
+            border-radius: 0.5rem;
+            padding: 8px;
+            background-color: white;
+            scrollbar-width: thin;
+        }
+        
+        /* Scrollbar styling */
+        .recipe-steps-container::-webkit-scrollbar {
+            width: 6px;
+            background-color: #f0f2f6;
+        }
+        .recipe-steps-container::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 3px;
         }
         </style>
         """, unsafe_allow_html=True)
@@ -173,13 +236,15 @@ def display_recipe_instructions(instructions):
         st.write("No instructions available.")
         return
 
+    # Create a single HTML string for all steps with compact formatting
+    steps_html = '<div class="recipe-steps-container">'
     for i, step in enumerate(steps, 1):
-        st.markdown(f"""
-            <div class="recipe-step">
-                <span class="step-number">Step {i}</span>
-                <span class="step-text">{step}</span>
-            </div>
-        """, unsafe_allow_html=True)
+        if step:  # Only add non-empty steps
+            steps_html += f'<div class="recipe-step"><span class="step-number">{i}.</span><span class="step-text">{step}</span></div>'
+    steps_html += '</div>'
+
+    # Display all steps at once in the container
+    st.markdown(steps_html, unsafe_allow_html=True)
 
 def format_recipe_ingredients(ingredients_str):
     """Format recipe ingredients into a clean list."""
@@ -205,7 +270,6 @@ def display_recipe_ingredients(ingredients):
             background-color: #ffffff;
             padding: 5px;
             border-radius: 5px;
-            margin-bottom: 5px;
         }
         .ingredients-header {
             color: #2c3e50;
@@ -263,10 +327,81 @@ def display_recipe_ingredients(ingredients):
     
     st.markdown("</div></div>", unsafe_allow_html=True)
 
+def display_selected_foods(selected_foods):
+    """
+    Display selected foods in styled capsules within a scrollable container
+    """
+    st.markdown("""
+        <style>
+            .selected-foods-container {
+                max-height: 200px;
+                overflow-y: auto;
+                border: 1px solid #f0f2f6;
+                border-radius: 0.5rem;
+                padding: 0.5rem;
+                background-color: white;
+                margin: 0.3rem 0;
+                margin-bottom: 0.75rem;
+                scrollbar-width: thin;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            .selected-foods-container::-webkit-scrollbar {
+                width: 6px;
+                background-color: #f0f2f6;
+            }
+            .selected-foods-container::-webkit-scrollbar-thumb {
+                background-color: #ccc;
+                border-radius: 3px;
+            }
+            .selected-foods-header {
+                display: flex;
+                font-size: 1rem;
+                font-weight: 600;
+                font-size: 1.3em;
+                font-weight: bold;
+                color: #262730;
+            }
+            .food-capsule {
+                display: inline-flex;
+                align-items: center;
+                font-size: 0.85rem;
+                color: #262730;
+                background-color: #d7ccc8;
+                border-radius: 1rem;
+                padding: 0.35rem 0.8rem;
+                font-family: 'Source Sans Pro', sans-serif;
+                transition: all 0.2s;
+            }
+            .food-capsule:hover {
+                background-color: #e1e4eb;
+                transform: translateY(-1px);
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Display header
+    st.markdown('<div class="selected-foods-header">Selected Foods:</div>', unsafe_allow_html=True)
+    
+    # Create container with capsule items
+    foods_html = '<div class="selected-foods-container">'
+    for food in selected_foods:
+        foods_html += f'<div class="food-capsule">{food}</div>'
+    foods_html += '</div>'
+
+    # Display the container
+    st.markdown(foods_html, unsafe_allow_html=True)
+
 def recipes_recommendation_sidebar():
     """Display recipe recommendations based on user preferences."""
     try:
-        st.title(" 🍽️ Discover Your Personalized Recipes")
+        st.markdown("""
+            <div class="header-container">
+                <span class="header-icon">🍽️</span>
+                <h1>Discover Your Personalized Recipes</h1>
+            </div>
+        """, unsafe_allow_html=True)
 
         if "user_data" not in st.session_state or "selected_foods" not in st.session_state:
             st.warning("Please get food recommendations first!")
@@ -275,6 +410,10 @@ def recipes_recommendation_sidebar():
                 st.switch_page("pages/food_recommendation.py")
             return
         
+        # display the selected foods from the food recommendation page 
+        if 'selected_foods' in st.session_state:
+            display_selected_foods(st.session_state.selected_foods)
+
         # Load dataset for slider min-max values
         df = pd.read_csv("data/preprocessed/recipes.csv")
 
@@ -332,7 +471,7 @@ def recipes_recommendation_sidebar():
             #st.info("ℹ️ Please select your dietary preference - adjust the sliders, and click 'Find Recipes' to see recommendations.")
         else:
             for idx, recipe in enumerate(recommended_recipes):
-                with st.expander(f" {recipe.get('Name', 'Unknown Recipe')} ({str(recipe.get('DietaryCategory', 'N/A'))})"):
+                with st.expander(f"**{recipe.get('Name', 'Unknown Recipe')}** ({str(recipe.get('DietaryCategory', 'N/A'))})"):
                     col1, col2 = st.columns([3, 2])
 
                     with col1:

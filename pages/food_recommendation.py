@@ -7,6 +7,104 @@ API_BASE_URL = "http://127.0.0.1:8000"
 SAVE_HISTORY_URL = f"{API_BASE_URL}/save-history/"
 GET_RECOMMENDATION_URL = f"{API_BASE_URL}/get-recommendation/"
 
+st.set_page_config(page_title="Food Recommendation System", layout="wide")
+# Add this CSS for the page header
+st.markdown("""
+    <style>
+        .main > div:first-child {
+            padding-top: 0.5rem !important;
+        }
+        .block-container {
+            padding-top: 1.25rem !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+        }
+        h1 {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        /* Style for the header container */
+        .header-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            margin: 0;
+            
+        }
+        /* Style for the header icon */
+        .header-icon {
+            font-size: 2rem;
+            margin-right: 0.3rem;
+        }   
+        .nutrient-info {
+            text-align: right;
+            color: #666666;
+            font-size: 0.9rem;
+            font-style: italic;
+            opacity: 0.8;
+        }
+        .user-note {
+            text-align: right;
+            color: #1f77b4;  /* A nice blue color */
+            font-size: 0.85rem;
+            font-style: italic;
+            border-radius: 4px;
+        }
+        .recommendation-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #262730;
+            margin-bottom: 0.2rem;
+            padding-bottom: 0.2rem;
+            border-bottom: 2px solid #f0f2f6;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        /* Style for the page link button */
+        [data-testid="stPageLink"] {
+            background-color: transparent;
+            border: 1px solid #e0e0e0;  
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            color: #262730 !important; 
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            cursor: pointer;
+        }
+
+        [data-testid="stPageLink"]:hover {
+            background-color: transparent; 
+            border-color: #ff4b4b; 
+            color: #ff4b4b !important; 
+        }
+
+        [data-testid="stPageLink"] p {
+            color: inherit !important;
+            margin: 0;
+            font-size: 1rem;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        [data-testid="stPageLink"]:hover p {
+            color: #ff4b4b !important; 
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+        <div class="header-container">
+            <span class="header-icon">🍽️</span>
+            <h1>Culinary Compass <span style="font-size: 1.5rem; font-weight: 900;">- Flavor Meets Wellness</span></h1>
+        </div> 
+    """, unsafe_allow_html=True)
+
 def load_data():
     """Load processed food data and extract unique categories."""
     df = pd.read_csv("data/preprocessed/food.csv")
@@ -95,11 +193,73 @@ def save_to_api(user_data: dict, recommendation: list):
         print(f"Error saving to API: {str(e)}")
         st.error("Failed to save data to API. Please try again.")
 
+def display_selected_foods(selected_foods):
+    """
+    Display selected foods in styled capsules within a scrollable container
+    """
+    st.markdown("""
+        <style>
+            .selected-foods-container {
+                max-height: 200px;
+                overflow-y: auto;
+                border: 1px solid #f0f2f6;
+                border-radius: 0.5rem;
+                padding: 0.5rem;
+                background-color: white;
+                margin: 0.3rem 0;
+                margin-bottom: 0.5rem;
+                scrollbar-width: thin;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            .selected-foods-container::-webkit-scrollbar {
+                width: 6px;
+                background-color: #f0f2f6;
+            }
+            .selected-foods-container::-webkit-scrollbar-thumb {
+                background-color: #ccc;
+                border-radius: 3px;
+            }
+            .selected-foods-header {
+                display: flex;
+                font-size: 1rem;
+                font-weight: 600;
+                font-size: 1.3em;
+                font-weight: bold;
+                color: #262730;
+            }
+            .food-capsule {
+                display: inline-flex;
+                align-items: center;
+                font-size: 0.85rem;
+                color: #262730;
+                background-color: #d7ccc8;
+                border-radius: 1rem;
+                padding: 0.35rem 0.8rem;
+                font-family: 'Source Sans Pro', sans-serif;
+                transition: all 0.2s;
+            }
+            .food-capsule:hover {
+                background-color: #e1e4eb;
+                transform: translateY(-1px);
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Display header
+    if selected_foods:
+        st.markdown('<div class="selected-foods-header">Selected Foods:</div>', unsafe_allow_html=True)
+        # Create container with capsule items
+        foods_html = '<div class="selected-foods-container">'
+        for food in selected_foods:
+            foods_html += f'<div class="food-capsule">{food}</div>'
+        foods_html += '</div>'
+        # Display the container
+        st.markdown(foods_html, unsafe_allow_html=True)
+
 def main():
     """Main function to run the Streamlit app."""
-    st.set_page_config(page_title="Food Recommendation System", layout="wide")
-    st.title("Culinary Compass : Flavor Meets Wellness")
-    
     
     # Clear session state when the page is loaded
     if 'user_data' not in st.session_state:
@@ -227,11 +387,17 @@ def main():
         st.write(f"**BMI:** {user_data['bmi']}  |  **Category:** {user_data['bmi_category']}")
 
         if user_data['deficiencies']:
-            st.write(f"**Selected Deficiencies:** {', '.join(user_data['deficiencies'])}")
+            st.write(f"**Deficiencies:** {', '.join(user_data['deficiencies'])}")
 
 
         if st.session_state['recommendation']:
-            st.subheader("Here's your food recommendation:")
+            st.markdown("""
+                <div class="recommendation-header">
+                    Recommended Recipes Based on Your Selection
+                </div>
+            """, unsafe_allow_html=True)
+            st.markdown('<div class="nutrient-info">Food nutrients are measured in milligrams per 100 grams (mg/100g)</div>', unsafe_allow_html=True)
+            st.markdown('<div class="user-note">Select the foods you want to find personalized recipes for.</div>', unsafe_allow_html=True)
             for category in st.session_state['recommendation']:
                 #st.markdown(f"### {category['main_category']}")  # Main category as header
                 for sub_cat in category['sub_categories']:
@@ -263,16 +429,20 @@ def main():
 
         
                             
-            # Show selected foods
-            st.subheader("Your Selected Foods:")
-            if st.session_state["selected_foods"]:
-                st.write(", ".join(st.session_state["selected_foods"]))
-            else:
-                st.write("No foods selected yet.")
+            # # Show selected foods
+            # st.subheader("Your Selected Foods:")
+            # if st.session_state["selected_foods"]:
+            #     st.write(", ".join(st.session_state["selected_foods"]))
+            # else:
+            #     st.write("No foods selected yet.")
+
+            # display the selected foods from the food recommendation page 
+            if 'selected_foods' in st.session_state:
+                display_selected_foods(st.session_state.selected_foods)
 
         # Navigation to recipe selection
         if st.session_state["selected_foods"]:
-            st.page_link("pages/recipes_recommendation.py", label="Select Recipes For These Foods :arrow_right:")
+            st.page_link("pages/recipes_recommendation.py", label="Select Recipes For These Foods")
 
     # Footer
     st.markdown("---")
