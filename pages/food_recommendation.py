@@ -62,6 +62,39 @@ st.markdown("""
             align-items: center;
             gap: 0.5rem;
         }
+        /* Style for the page link button */
+        [data-testid="stPageLink"] {
+            background-color: transparent;
+            border: 1px solid #e0e0e0;  
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            color: #262730 !important; 
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            cursor: pointer;
+        }
+
+        [data-testid="stPageLink"]:hover {
+            background-color: transparent; 
+            border-color: #ff4b4b; 
+            color: #ff4b4b !important; 
+        }
+
+        [data-testid="stPageLink"] p {
+            color: inherit !important;
+            margin: 0;
+            font-size: 1rem;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        [data-testid="stPageLink"]:hover p {
+            color: #ff4b4b !important; 
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -409,7 +442,7 @@ def main():
 
         # Navigation to recipe selection
         if st.session_state["selected_foods"]:
-            st.page_link("pages/recipes_recommendation.py", label="Select Recipes For These Foods :arrow_right:")
+            st.page_link("pages/recipes_recommendation.py", label="Select Recipes For These Foods")
 
     # Footer
     st.markdown("---")

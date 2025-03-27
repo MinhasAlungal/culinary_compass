@@ -341,6 +341,7 @@ def display_selected_foods(selected_foods):
                 padding: 0.5rem;
                 background-color: white;
                 margin: 0.3rem 0;
+                margin-bottom: 0.75rem;
                 scrollbar-width: thin;
                 display: flex;
                 flex-wrap: wrap;
@@ -470,7 +471,7 @@ def recipes_recommendation_sidebar():
             #st.info("ℹ️ Please select your dietary preference - adjust the sliders, and click 'Find Recipes' to see recommendations.")
         else:
             for idx, recipe in enumerate(recommended_recipes):
-                with st.expander(f" {recipe.get('Name', 'Unknown Recipe')} ({str(recipe.get('DietaryCategory', 'N/A'))})"):
+                with st.expander(f"**{recipe.get('Name', 'Unknown Recipe')}** ({str(recipe.get('DietaryCategory', 'N/A'))})"):
                     col1, col2 = st.columns([3, 2])
 
                     with col1:
