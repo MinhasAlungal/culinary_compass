@@ -37,6 +37,31 @@ st.markdown("""
             font-size: 2rem;
             margin-right: 0.3rem;
         }   
+        .nutrient-info {
+            text-align: right;
+            color: #666666;
+            font-size: 0.9rem;
+            font-style: italic;
+            opacity: 0.8;
+        }
+        .user-note {
+            text-align: right;
+            color: #1f77b4;  /* A nice blue color */
+            font-size: 0.85rem;
+            font-style: italic;
+            border-radius: 4px;
+        }
+        .recommendation-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #262730;
+            margin-bottom: 0.2rem;
+            padding-bottom: 0.2rem;
+            border-bottom: 2px solid #f0f2f6;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -149,6 +174,7 @@ def display_selected_foods(selected_foods):
                 padding: 0.5rem;
                 background-color: white;
                 margin: 0.3rem 0;
+                margin-bottom: 0.5rem;
                 scrollbar-width: thin;
                 display: flex;
                 flex-wrap: wrap;
@@ -328,11 +354,17 @@ def main():
         st.write(f"**BMI:** {user_data['bmi']}  |  **Category:** {user_data['bmi_category']}")
 
         if user_data['deficiencies']:
-            st.write(f"**Selected Deficiencies:** {', '.join(user_data['deficiencies'])}")
+            st.write(f"**Deficiencies:** {', '.join(user_data['deficiencies'])}")
 
 
         if st.session_state['recommendation']:
-            st.subheader("Here's your food recommendation:")
+            st.markdown("""
+                <div class="recommendation-header">
+                    Recommended Recipes Based on Your Selection
+                </div>
+            """, unsafe_allow_html=True)
+            st.markdown('<div class="nutrient-info">Food nutrients are measured in milligrams per 100 grams (mg/100g)</div>', unsafe_allow_html=True)
+            st.markdown('<div class="user-note">Select the foods you want to find personalized recipes for.</div>', unsafe_allow_html=True)
             for category in st.session_state['recommendation']:
                 #st.markdown(f"### {category['main_category']}")  # Main category as header
                 for sub_cat in category['sub_categories']:
