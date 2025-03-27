@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import torch
 from sentence_transformers import SentenceTransformer, util
+from sklearn.metrics.pairwise import cosine_similarity
 import pickle
 
 # Set device (CPU or GPU)
@@ -52,15 +53,33 @@ def recommend_recipes(nutrients, ingredients, diet_preference):
     
     df_nutrients = df_filtered[nutrient_columns].fillna(0).to_numpy()
     input_nutrient_array = np.array([nutrients[col] for col in nutrient_columns]).reshape(1, -1)
+    input_nutrient_array = input_nutrient_array/input_nutrient_array.max() # to normalize
 
-    nutrient_distances = np.linalg.norm(df_nutrients - input_nutrient_array, axis=1)
-    nutrient_similarities = 1 / (1 + nutrient_distances)
+    #nutrient_distances = np.linalg.norm(df_nutrients - input_nutrient_array, axis=1)
+    #nutrient_similarities = 1 / (1 + nutrient_distances)
+
+    #trying cosine similarity
+    # Extract recipe nutrient vectors
+    recipe_vectors = np.array(df_filtered[nutrient_columns].values)  # Get nutrient values only
+    recipe_vectors = recipe_vectors/recipe_vectors.max() # to normalize
+
+    # Compute cosine similarity between user input and all recipes
+    nutrient_similarities = cosine_similarity(input_nutrient_array, recipe_vectors)
+
+    # Add similarity scores to DataFrame
+    df_filtered["similarity"] = nutrient_similarities[0]
+
+    # Sort recipes by similarity score
+    #recommended_recipes = recipes.sort_values(by="similarity", ascending=False)
+
+    # Display Top Recommendations
+    #print(recommended_recipes[["recipe", "similarity"]])
 
     # Final score (weighted)
-    final_scores = (0.3 * nutrient_similarities) + (0.7 * ingredient_similarities)
+    final_scores = (0.4 * nutrient_similarities) + (0.6 * ingredient_similarities)
 
     # Get top recommendations
-    df_filtered["SimilarityScore"] = final_scores
+    df_filtered["SimilarityScore"] = final_scores.flatten()
     top_recipes = df_filtered.sort_values(by="SimilarityScore", ascending=False).head(5)
 
     return top_recipes[

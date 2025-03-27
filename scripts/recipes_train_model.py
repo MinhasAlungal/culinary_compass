@@ -5,7 +5,7 @@ import pickle
 
 # Load dataset
 df = pd.read_csv("data/preprocessed/recipes.csv")
-
+#df =df.iloc[0:3000]
 # Initialize model
 st_model = SentenceTransformer("all-MiniLM-L6-v2")
 
