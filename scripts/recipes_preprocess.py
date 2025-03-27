@@ -2,7 +2,7 @@ import pandas as pd
 
 # Load dataset
 df = pd.read_csv("data/recipes.csv")
-#df =df.iloc[0:3000]
+df =df.iloc[0:100000]
 
 # Define non-vegetarian keywords
 non_veg_keywords = set([
