@@ -108,6 +108,7 @@ st.markdown("""
 def load_data():
     """Load processed food data and extract unique categories."""
     df = pd.read_csv("data/preprocessed/food.csv")
+    original_df = pd.read_csv("data/original/food.csv")
     categories = df["main_category"].unique().tolist()
     deficiencies = [
         'calcium', 'potassium', 'zinc', 'vitamin_C', 'iron', 'magnesium', 
@@ -115,7 +116,7 @@ def load_data():
         'cholesterol', 'Niacin', 'vitamin_B_6', 'choline_total', 'vitamin_A', 
         'vitamin_K', 'folate_total', 'vitamin_B_12', 'selenium', 'vitamin_D'
     ]
-    return df, categories, deficiencies
+    return df, original_df, categories, deficiencies
 
 def calculate_bmi(weight, height):
     """Calculate and categorize BMI."""
@@ -234,7 +235,7 @@ def display_selected_foods(selected_foods):
                 align-items: center;
                 font-size: 0.85rem;
                 color: #262730;
-                background-color: #d7ccc8;
+                background-color: #e8ecf0;
                 border-radius: 1rem;
                 padding: 0.35rem 0.8rem;
                 font-family: 'Source Sans Pro', sans-serif;
@@ -274,7 +275,7 @@ def main():
         st.session_state['previous_deficiencies'] = []
 
     # Load Data
-    df, categories, deficiencies = load_data()
+    df, original_df, categories, deficiencies = load_data()
 
     # Sidebar Input
     st.sidebar.header("User Information")
@@ -300,39 +301,93 @@ def main():
         # Force a rerun to update the UI
         st.rerun()
 
+    # st.sidebar.write("Select Deficiencies:")
+    # cols = st.sidebar.columns(2)
+    
+    # # Check if any deficiency checkbox was clicked
+    # any_deficiency_clicked = False
+    # selected_deficiencies = []
+    
+    # # Handle deficiency selection and detect changes
+    # for i, d in enumerate(deficiencies):
+    #     # Create checkbox in appropriate column
+    #     was_selected = d in st.session_state.get('previous_deficiencies', [])
+    #     is_selected = cols[i % 2].checkbox(d, key=f"def_{d}", value=was_selected)
+        
+    #     # Check if this deficiency's state changed
+    #     if is_selected != was_selected:
+    #         any_deficiency_clicked = True
+        
+    #     # Add to selected deficiencies if checked
+    #     if is_selected:
+    #         selected_deficiencies.append(d)
+    
+    # # Clear session state if any deficiency was clicked
+    # if any_deficiency_clicked:
+    #     # Store current deficiency selection before clearing
+    #     st.session_state['previous_deficiencies'] = selected_deficiencies
+        
+    #     # Clear other session state values
+    #     st.session_state['user_data'] = None
+    #     st.session_state['recommendation'] = None
+    #     st.session_state['selected_foods'] = set()
+        
+    #     # Force a rerun to update the UI
+    #     st.rerun()
+
+    ##added
+        
+    # Maximum number of selections allowed
+    max_selections = 3
+
     st.sidebar.write("Select Deficiencies:")
     cols = st.sidebar.columns(2)
-    
-    # Check if any deficiency checkbox was clicked
-    any_deficiency_clicked = False
-    selected_deficiencies = []
-    
+
+    # Track previously selected deficiencies from session state
+    previous_deficiencies = st.session_state.get('previous_deficiencies', [])
+
+    # Track the selected deficiencies
+    selected_deficiencies = previous_deficiencies.copy()
+
     # Handle deficiency selection and detect changes
+    any_deficiency_clicked = False
+
     for i, d in enumerate(deficiencies):
-        # Create checkbox in appropriate column
-        was_selected = d in st.session_state.get('previous_deficiencies', [])
-        is_selected = cols[i % 2].checkbox(d, key=f"def_{d}", value=was_selected)
-        
+        # Was this deficiency previously selected?
+        was_selected = d in previous_deficiencies
+
+        # Disable all checkboxes if 3 deficiencies are selected, allow changes if one is deselected
+        is_disabled = len(selected_deficiencies) >= max_selections and not was_selected
+
+        # Create checkbox (disabled if needed)
+        is_selected = cols[i % 2].checkbox(d, key=f"def_{d}", value=was_selected, disabled=is_disabled)
+
         # Check if this deficiency's state changed
         if is_selected != was_selected:
             any_deficiency_clicked = True
-        
-        # Add to selected deficiencies if checked
-        if is_selected:
+
+        # Add to selected deficiencies if checked and not already selected
+        if is_selected and d not in selected_deficiencies:
             selected_deficiencies.append(d)
-    
-    # Clear session state if any deficiency was clicked
+
+        # Remove from selected deficiencies if unchecked
+        elif not is_selected and d in selected_deficiencies:
+            selected_deficiencies.remove(d)
+
+    # Store current deficiency selection in session state if any change was detected
     if any_deficiency_clicked:
-        # Store current deficiency selection before clearing
         st.session_state['previous_deficiencies'] = selected_deficiencies
-        
-        # Clear other session state values
+
+        # Optionally clear other session state values if you want to reset them
         st.session_state['user_data'] = None
         st.session_state['recommendation'] = None
         st.session_state['selected_foods'] = set()
-        
+
         # Force a rerun to update the UI
         st.rerun()
+
+
+    #######
 
     if st.sidebar.button("Get Recommendation"):
         if not name:
@@ -396,7 +451,7 @@ def main():
                     Recommended Recipes Based on Your Selection
                 </div>
             """, unsafe_allow_html=True)
-            st.markdown('<div class="nutrient-info">Food nutrients are measured in milligrams per 100 grams (mg/100g)</div>', unsafe_allow_html=True)
+            #st.markdown('<div class="nutrient-info">Food nutrients are measured in milligrams per 100 grams (mg/100g)</div>', unsafe_allow_html=True)
             st.markdown('<div class="user-note">Select the foods you want to find personalized recipes for.</div>', unsafe_allow_html=True)
             for category in st.session_state['recommendation']:
                 #st.markdown(f"### {category['main_category']}")  # Main category as header
@@ -419,7 +474,49 @@ def main():
                                     #st.write(f"**{food_name}:** {nutrient_str}")
 
                         # Display checkbox for selecting food
-                            selected = col.checkbox(food_name + ' ' + nutrient_str,key=f"food_{food_name}", value=food_name in st.session_state["selected_foods"])
+                           # selected = col.checkbox(food_name + ' ' + nutrient_str,key=f"food_{food_name}", value=food_name in st.session_state["selected_foods"])
+                           
+                           # # Convert nutrient_str into a dictionary
+                            nutrient_dict = dict(item.split(": ") for item in nutrient_str.split(", "))
+
+                            # Convert string values to floats
+                            nutrient_dict = {key: float(value) for key, value in nutrient_dict.items()}
+                            
+                            ##another
+                           
+                            nutrient_display = "<div style='display: flex; justify-content: start;'>"  # Start the flex container for horizontal layout
+
+                            for nutrient, value in nutrient_dict.items():
+
+                                max_value = max(original_df[nutrient])
+                                #st.write(max_value)
+                                # Calculate percentage for the circular progress bar, ensuring it doesn't exceed 100%
+                                percentage = int((value / max_value) * 100)  # Limit percentage to 100
+                                
+                                # Create a small circle (30px by 30px) with progress bar, no numbers
+                                circle_html = f"""
+                                <div style="width: 20px;  height: 20px; border-radius: 50%; background: conic-gradient(#ff5900 {percentage}%, #d3d3d3 {percentage}%); margin-right: 10px;"></div>
+                                """
+                                # Append the nutrient and its corresponding circle to the display string
+                                nutrient_display += f"<div style='display: inline-block; font-size:12px;, text-align: center; margin-right: 15px;'><b>{nutrient.capitalize()}</b>{circle_html}</div>"
+
+                            nutrient_display += "</div>"  # Close the flex container
+
+                            # Display food name and nutrient progress indicators in a single line
+                            #st.markdown(f"**{food_name}** <br>{nutrient_display}", unsafe_allow_html=True)
+
+                            with col:
+                                # Use columns inside the main column to align checkbox & nutrients in one row
+                                c1, c2 = st.columns([3, 2])  # Adjust ratio for spacing
+                                with c1:
+                                    selected = st.checkbox(f"{food_name}", key=f"food_{food_name}")
+                                with c2:
+                                    st.markdown(nutrient_display, unsafe_allow_html=True) # Nutrient indicators in col
+                            # Checkbox to select food (optional, this doesn't affect nutrient display)
+                            # selected = st.checkbox(f"Select {food_name}", key=f"food_{food_name}")
+                            # st.markdown(f"{nutrient_display}", unsafe_allow_html=True)
+                            
+
 
                     # Update session state based on user selection
                             if selected:
