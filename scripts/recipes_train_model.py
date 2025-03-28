@@ -7,8 +7,9 @@ import pickle
 df = pd.read_csv("data/preprocessed/recipes.csv")
 #df =df.iloc[0:3000]
 # Initialize model
-st_model = SentenceTransformer("all-MiniLM-L6-v2")
-
+#st_model = SentenceTransformer("all-MiniLM-L6-v2")
+#all-mpnet-base-v2
+st_model = SentenceTransformer("all-mpnet-base-v2")
 # Save the trained model
 with open("models/recipes_st.pkl", "wb") as model_file:
     pickle.dump(st_model, model_file)

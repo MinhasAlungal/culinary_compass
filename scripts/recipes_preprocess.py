@@ -55,5 +55,16 @@ def classify_recipe(row):
 # Apply classification
 df["DietaryCategory"] = df.apply(classify_recipe, axis=1)
 
+#checking if all the columns have 0 as value
+nutrient_columns = ["Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", 
+                        "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"]
+zero_nutrient_rows = df[nutrient_columns][(df[nutrient_columns] == 0).all(axis=1)]
+print(zero_nutrient_rows)
+zero_nutrient_row_count = (df[nutrient_columns] == 0).all(axis=1).sum()
+print(zero_nutrient_row_count)
+df = df[~(df[nutrient_columns] == 0).all(axis=1)]
 # Save processed data
 df.to_csv("data/preprocessed/recipes.csv", index=False)
+
+#zero_nutrient_row_count = (df[nutrient_columns] == 0).all(axis=1).sum() # to check
+#print(zero_nutrient_row_count)
