@@ -47,8 +47,10 @@ def recommend_recipes(nutrients, ingredients, diet_preference):
     ingredient_similarities = util.pytorch_cos_sim(ingredient_embeddings, input_embedding).squeeze().cpu().numpy()
 
     # Compute Euclidean similarity for nutrients
-    nutrient_columns = ["Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", 
-                        "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"]
+    # nutrient_columns = ["Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", 
+    #                     "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"]
+
+    nutrient_columns = ["Calories", "FatContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"]
     
     df_nutrients = df_filtered[nutrient_columns].fillna(0).to_numpy()
     input_nutrient_array = np.array([nutrients[col] for col in nutrient_columns]).reshape(1, -1)

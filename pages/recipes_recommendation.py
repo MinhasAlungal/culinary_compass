@@ -39,6 +39,31 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Add this CSS at the top of your file
+st.markdown("""
+    <style>
+        /* Sidebar slider container */
+        .sidebar-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 0;
+        }
+        
+        .sidebar-slider-label {
+            min-width: 100px;  /* Adjust width based on your longest label */
+            color: #262730;
+            font-size: 0.9rem;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+        
+        /* Hide original label */
+        .stSlider > label {
+            display: none !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 def extract_image_urls(image_str):
     """Extract image URLs from the 'c(\"...\")' format."""
     if isinstance(image_str, str):
@@ -53,9 +78,9 @@ def show_nutrition_pie_chart(recipe):
         "Protein (g)": recipe.get("ProteinContent", 0),
         "Fat (g)": recipe.get("FatContent", 0),
         "Carbs (g)": recipe.get("CarbohydrateContent", 0),
-        "Saturated Fat (g)": recipe.get("SaturatedFatContent", 0),
-        "Cholesterol (mg)": recipe.get("CholesterolContent", 0),
-        "Sodium (mg)": recipe.get("SodiumContent", 0),
+        # "Saturated Fat (g)": recipe.get("SaturatedFatContent", 0),
+        # "Cholesterol (mg)": recipe.get("CholesterolContent", 0),
+        # "Sodium (mg)": recipe.get("SodiumContent", 0),
         "Fiber (g)": recipe.get("FiberContent", 0),
         "Sugar (g)": recipe.get("SugarContent", 0),
     }
@@ -413,7 +438,7 @@ def recipes_recommendation_sidebar():
         # display the selected foods from the food recommendation page 
         if 'selected_foods' in st.session_state:
             display_selected_foods(st.session_state.selected_foods)
-
+        
         # Load dataset for slider min-max values
         df = pd.read_csv("data/preprocessed/recipes.csv")
 
@@ -421,18 +446,37 @@ def recipes_recommendation_sidebar():
         diet_preference = user_data.get('food_preference', None)
         selected_foods = st.session_state['selected_foods']
 
-        # Nutrient sliders
-        user_nutrients = {
-            "Calories": st.sidebar.slider('Calories', float(df['Calories'].min()), float(df['Calories'].max()), float(df['Calories'].min()), step=0.1),
-            "FatContent": st.sidebar.slider('Fat', float(df['FatContent'].min()), float(df['FatContent'].max()), float(df['FatContent'].min()), step=0.1),
-            "SaturatedFatContent": st.sidebar.slider('Saturated Fat', float(df['SaturatedFatContent'].min()), float(df['SaturatedFatContent'].max()), float(df['SaturatedFatContent'].min()), step=0.1),
-            "CholesterolContent": st.sidebar.slider('Cholesterol', float(df['CholesterolContent'].min()), float(df['CholesterolContent'].max()), float(df['CholesterolContent'].min()), step=0.1),
-            "SodiumContent": st.sidebar.slider('Sodium', float(df['SodiumContent'].min()), float(df['SodiumContent'].max()), float(df['SodiumContent'].min()), step=0.1),
-            "CarbohydrateContent": st.sidebar.slider('Carbohydrate', float(df['CarbohydrateContent'].min()), float(df['CarbohydrateContent'].max()), float(df['CarbohydrateContent'].min()), step=0.1),
-            "FiberContent": st.sidebar.slider('Fiber', float(df['FiberContent'].min()), float(df['FiberContent'].max()), float(df['FiberContent'].min()), step=0.1),
-            "SugarContent": st.sidebar.slider('Sugar', float(df['SugarContent'].min()), float(df['SugarContent'].max()), float(df['SugarContent'].min()), step=0.1),
-            "ProteinContent": st.sidebar.slider('Protein', float(df['ProteinContent'].min()), float(df['ProteinContent'].max()), float(df['ProteinContent'].min()), step=0.1),
-        }
+        # Create two columns in the sidebar with appropriate width ratio
+        st.sidebar.markdown("### Nutrient Preferences")
+
+        # Define the nutrients with their display names and keys
+        nutrients = [
+            ("Calories", "Calories"),
+            ("Fat", "FatContent"),
+            # ("Saturated Fat", "SaturatedFatContent"),
+            # ("Cholesterol", "CholesterolContent"),
+            # ("Sodium", "SodiumContent"),
+            ("Carbs", "CarbohydrateContent"),
+            ("Fiber", "FiberContent"),
+            ("Sugar", "SugarContent"),
+            ("Protein", "ProteinContent")
+        ]
+
+        user_nutrients = {}
+
+        for display_name, key in nutrients:
+            cols = st.sidebar.columns([1, 3])  # Create columns with 1:3 ratio
+            with cols[0]:
+                st.write(f"{display_name}:")  # Label in first column
+            with cols[1]:
+                user_nutrients[key] = st.slider(
+                    "##",  # Hidden label
+                    min_value=float(df[key].min()),
+                    max_value=float(df[key].max()),
+                    value=float(df[key].min()),
+                    step=0.1,
+                    label_visibility="collapsed"  # This ensures the label is hidden
+                )
 
         if st.sidebar.button("Find Recipes"):
             if not diet_preference or any(value is None for value in user_nutrients.values()):
