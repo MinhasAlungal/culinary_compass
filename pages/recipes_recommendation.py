@@ -393,7 +393,7 @@ def display_selected_foods(selected_foods):
                 align-items: center;
                 font-size: 0.85rem;
                 color: #262730;
-                background-color: #d7ccc8;
+                background-color: #e8ecf0;
                 border-radius: 1rem;
                 padding: 0.35rem 0.8rem;
                 font-family: 'Source Sans Pro', sans-serif;
