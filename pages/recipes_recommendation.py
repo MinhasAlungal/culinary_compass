@@ -64,6 +64,29 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Add this CSS for the expander header
+st.markdown("""
+    <style>
+        .expander-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .left {
+            color: #2c3e50;
+            font-size: 1.3em;
+            font-weight: bold;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .right {
+            color: #ff4b4b;
+            text-align: right;
+        }
+    </style>
+""", unsafe_allow_html=True)
 def extract_image_urls(image_str):
     """Extract image URLs from the 'c(\"...\")' format."""
     if isinstance(image_str, str):
@@ -78,11 +101,14 @@ def show_nutrition_pie_chart(recipe):
         "Protein (g)": recipe.get("ProteinContent", 0),
         "Fat (g)": recipe.get("FatContent", 0),
         "Carbs (g)": recipe.get("CarbohydrateContent", 0),
-        # "Saturated Fat (g)": recipe.get("SaturatedFatContent", 0),
-        # "Cholesterol (mg)": recipe.get("CholesterolContent", 0),
-        # "Sodium (mg)": recipe.get("SodiumContent", 0),
+        "Saturated Fat (g)": recipe.get("SaturatedFatContent", 0),
+        # convert cholesterol content from mg to g
+        "Cholesterol (g)": recipe.get("CholesterolContent", 0) / 1000,
+        # convert sodium content from mg to g
+        "Sodium (g)": recipe.get("SodiumContent", 0) / 1000,
         "Fiber (g)": recipe.get("FiberContent", 0),
         "Sugar (g)": recipe.get("SugarContent", 0),
+        "Other (g)": recipe.get("OtherNutrients", 0),
     }
 
     # Filter out nutrients with zero values
@@ -113,7 +139,8 @@ def show_nutrition_pie_chart(recipe):
     wedges, texts, autotexts = ax.pie(
         values,
         colors=colors[:len(values)],
-        autopct=lambda pct: f'{pct:.1f}%' if pct > 5 else '',  # Only show percentage if > 5%
+        autopct='%1.1f%%',
+        # autopct=lambda pct: f'{pct:.1f}%' if pct > 5 else '',  # Only show percentage if > 5%
         pctdistance=0.75,
         startangle=90,
         wedgeprops={
@@ -515,7 +542,14 @@ def recipes_recommendation_sidebar():
             #st.info("ℹ️ Please select your dietary preference - adjust the sliders, and click 'Find Recipes' to see recommendations.")
         else:
             for idx, recipe in enumerate(recommended_recipes):
-                with st.expander(f"**{recipe.get('Name', 'Unknown Recipe')}** ({str(recipe.get('DietaryCategory', 'N/A'))})"):
+                with st.expander(f"**{recipe.get('Name', 'Unknown Recipe')}**"):
+                    # Creating an expander with a properly formatted header
+                    header_content = f"""
+                        <div class='expander-header'>
+                            <span class='left'>{recipe.get('Name', 'Unknown Recipe')} ({recipe.get('DietaryCategory', 'N/A')})</span>
+                            <span class='right'>{recipe.get('Calories', 'N/A')} kcal</span>
+                        </div>"""
+                    st.markdown(header_content, unsafe_allow_html=True)
                     col1, col2 = st.columns([3, 2])
 
                     with col1:
@@ -529,6 +563,7 @@ def recipes_recommendation_sidebar():
                         st.write("**Fiber**: " + str(recipe.get('FiberContent', 'N/A')))
                         st.write("**Sugar**: " + str(recipe.get('SugarContent', 'N/A')))
                         st.write("**Protein**: " + str(recipe.get('ProteinContent', 'N/A'))) 
+                        st.write("**Other**: " + str(recipe.get('OtherNutrients', 'N/A')))
                         # to-be removed -- end
 
                         ingredients = recipe.get('RecipeIngredientParts', 'N/A')

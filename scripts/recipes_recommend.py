@@ -130,7 +130,18 @@ def recommend_recipes(nutrients, ingredients, diet_preference):
       # Get top recommendations
     recommended_recipes["SimilarityScore"] = recommended_recipes.apply(lambda row:row["nutrient_similarity"]*0.5 + row["ingredient_similarity"]*0.5, axis=1)
     
-
+    # to-be removed if we decide to remove the other nutrients -- start 
+    # add sum of  SaturatedFatContent, CholesterolContent and SodiumContent as a new column named "Other"
+    # top_recipes["OtherNutrients"] = top_recipes["SaturatedFatContent"] + top_recipes["CholesterolContent"] + top_recipes["SodiumContent"]
+    # return top_recipes[
+    #     [
+    #         "Name", "CookTime", "Images", "RecipeCategory", "Keywords", 
+    #         "RecipeIngredientQuantities", "RecipeIngredientParts", 
+    #         "Calories", "FatContent", "CarbohydrateContent", "FiberContent", 
+    #         "SugarContent", "ProteinContent", "OtherNutrients", "RecipeInstructions", "DietaryCategory"
+    #     ]
+    # ].to_dict(orient="records")
+    # to-be removed -- end
 
     # Sort recipes by similarity score
     recommended_recipes = recommended_recipes.sort_values(by="SimilarityScore", ascending=False)
