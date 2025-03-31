@@ -25,7 +25,7 @@ non_veg_keywords = set([
     "mussels", "clams", "oysters", "abalone", "conch",
 
     # Animal-Based Ingredients
-    "eggs", "gelatin", "lard", "suet", "tallow", "bone broth", "fish sauce", "oyster sauce",
+    "egg", "eggs", "gelatin", "lard", "suet", "tallow", "bone broth", "fish sauce", "oyster sauce",
     "shrimp paste", "anchovy paste", "worcestershire sauce", "caviar", "roe", "squid ink",
 
     # Organ Meats (Offal)
@@ -47,8 +47,18 @@ def classify_recipe(row):
     categories = str(row["RecipeCategory"]).lower().replace('"', '').replace("c(", "").replace(")", "")
     category_list = [cat.strip() for cat in categories.split(",")]
 
-    # Check for non-veg keywords in ingredients or category
-    if any(any(non_veg in item for non_veg in non_veg_keywords) for item in ingredient_list + category_list):
+    # Extract and clean keywords list
+    keywords = str(row["Keywords"]).lower().replace('"', '').replace("c(", "").replace(")", "")
+    keyword_list = [kw.strip() for kw in keywords.split(",")]
+
+    # Extract recipe name
+    recipe_name = str(row["Name"]).lower()
+
+    # Combine all text sources to check for non-veg keywords
+    all_text = ingredient_list + category_list + keyword_list + [recipe_name]
+
+    # Check if any non-vegetarian keyword is found
+    if any(any(non_veg in item for non_veg in non_veg_keywords) for item in all_text):
         return "Non-Veg"
 
     return "Veg"

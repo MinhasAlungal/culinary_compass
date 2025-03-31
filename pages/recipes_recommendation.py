@@ -519,6 +519,18 @@ def recipes_recommendation_sidebar():
                     col1, col2 = st.columns([3, 2])
 
                     with col1:
+                        # to-be removed -- start
+                        st.write("**Calories**: " + str(recipe.get('Calories', 'N/A')))
+                        st.write("**Fat Content**: " + str(recipe.get('FatContent', 'N/A')))
+                        st.write("**Saturated Fat**: " + str(recipe.get('SaturatedFatContent', 'N/A')))
+                        st.write("**Cholesterol**: " + str(recipe.get('CholesterolContent', 'N/A')))
+                        st.write("**Sodium**: " + str(recipe.get('SodiumContent', 'N/A')))
+                        st.write("**Carbohydrates**: " + str(recipe.get('CarbohydrateContent', 'N/A')))
+                        st.write("**Fiber**: " + str(recipe.get('FiberContent', 'N/A')))
+                        st.write("**Sugar**: " + str(recipe.get('SugarContent', 'N/A')))
+                        st.write("**Protein**: " + str(recipe.get('ProteinContent', 'N/A'))) 
+                        # to-be removed -- end
+
                         ingredients = recipe.get('RecipeIngredientParts', 'N/A')
                         display_recipe_ingredients(ingredients)
                         instructions = recipe.get('RecipeInstructions', 'N/A')

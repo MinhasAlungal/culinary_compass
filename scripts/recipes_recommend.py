@@ -107,8 +107,8 @@ def recommend_recipes(nutrients, ingredients, diet_preference):
 
     recommended_recipes=recommended_recipes.head(50)
      # Compute Euclidean similarity for nutrients
-    nutrient_columns = ["Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", 
-                        "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"]
+    nutrient_columns = ["Calories", "FatContent", "CarbohydrateContent", "FiberContent", 
+                        "SugarContent", "ProteinContent"]
     
     df_nutrients = recommended_recipes[nutrient_columns].fillna(0).to_numpy()
     input_nutrient_array = np.array([nutrients[col] for col in nutrient_columns]).reshape(1, -1)
