@@ -8,8 +8,15 @@ import os
 # Load dataset
 df = pd.read_csv("data/preprocessed/recipes.csv")
 #df =df.iloc[0:50000]
+
 # Initialize model
-st_model = SentenceTransformer("all-MiniLM-L6-v2")
+# st_model = SentenceTransformer("all-MiniLM-L6-v2")
+
+#all-mpnet-base-v2
+# st_model = SentenceTransformer("all-mpnet-base-v2") - Observation Recommendation gets better but slow compared to all-MiniLM-L6-v2 
+
+#all-mpnet-base-v2
+st_model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
 
 # Save the trained model
 with open("models/recipes_st.pkl", "wb") as model_file:
@@ -55,5 +62,5 @@ all_embeddings = pd.concat(
     [pd.read_csv(f"{embedding_dir}/embeddings_batch_{i+1}.csv") for i in range(num_batches)],
     ignore_index=True
 )
-all_embeddings.to_csv("data/embeddings/recipes_embeddings.csv", index=False)
+all_embeddings.to_csv("data/embeddings/recipes.csv", index=False)
 print("All batch embeddings concatenated and saved.")
