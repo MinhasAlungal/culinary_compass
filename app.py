@@ -21,6 +21,43 @@ fig = px.bar(df_counts, x="Predicted Deficiency", y="Count", color="Gender", bar
              title="Gender-wise Nutrient Deficiencies")
 # Display in Streamlit
 st.plotly_chart(fig)
+
+# second plot deficiencies and diseases
+st.title("Deficiency & Disease Analysis")
+
+# Multiselect filter for deficiencies
+selected_deficiencies = st.multiselect("Select nutrient deficiencies:", df["Predicted Deficiency"].unique(), default=df["Predicted Deficiency"].unique())
+
+# Filter dataset based on selected deficiencies
+filtered_df = df[df["Predicted Deficiency"].isin(selected_deficiencies)]
+print(filtered_df.columns)
+columns= ['Age', 'Gender', 'Diet Type', 'Living Environment', 'Night Blindness',
+       'Dry Eyes', 'Bleeding Gums', 'Fatigue', 'Tingling Sensation',
+       'Low Sun Exposure', 'Reduced Memory Capacity', 'Shortness of Breath',
+       'Loss of Appetite', 'Fast Heart Rate', 'Brittle Nails', 'Weight Loss',
+       'Reduced Wound Healing Capacity', 'Skin Condition',
+       'Predicted Deficiency']
+
+# Compute gender-wise disease counts
+genderwise_counts = filtered_df.drop(columns=["Predicted Deficiency", "Age", "Diet Type", "Living Environment", "Low Sun Exposure"]).groupby("Gender").sum().reset_index()
+
+# Melt DataFrame for Plotly
+melted_df = genderwise_counts.melt(id_vars=["Gender"], var_name="Disease", value_name="Count")
+
+# Plotly Bar Chart
+fig = px.bar(
+    melted_df,
+    x="Disease",
+    y="Count",
+    color="Gender",
+    barmode="group",
+    title="Disease Counts by Gender",
+    labels={"Count": "Number of Cases", "Disease": "Disease"},
+    text="Count"
+)
+
+# Display Plot
+st.plotly_chart(fig, use_container_width=True)
 # Load the data set
 # penguins = pd.read_excel("data/food_data.xlsx")
 # st.dataframe(penguins)
