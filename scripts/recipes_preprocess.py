@@ -2,7 +2,8 @@ import pandas as pd
 
 # Load dataset
 df = pd.read_csv("data/recipes.csv")
-df =df.iloc[0:100000]
+# df =df.iloc[0:100000]
+df =df.iloc[0:3000] # For testing purposes
 
 # Define non-vegetarian keywords
 non_veg_keywords = set([
@@ -51,6 +52,22 @@ def classify_recipe(row):
         return "Non-Veg"
 
     return "Veg"
+
+# checking if all the columns have 0 as value
+nutrient_columns = ["Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", 
+                        "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"]
+
+# separate rows where all nutrient values are 0
+# This will create a DataFrame with only those rows
+zero_nutrient_rows = df[nutrient_columns][(df[nutrient_columns] == 0).all(axis=1)]
+# print(zero_nutrient_rows)
+
+# print total number of rows where all nutrient values are 0
+# zero_nutrient_row_count = (df[nutrient_columns] == 0).all(axis=1).sum()
+# print(zero_nutrient_row_count)
+
+# Remove rows where all nutrient values are 0
+df = df[~(df[nutrient_columns] == 0).all(axis=1)]
 
 # Apply classification
 df["DietaryCategory"] = df.apply(classify_recipe, axis=1)
