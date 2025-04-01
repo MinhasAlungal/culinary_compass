@@ -111,10 +111,9 @@ def load_data():
     original_df = pd.read_csv("data/original/food.csv")
     categories = df["main_category"].unique().tolist()
     deficiencies = [
-        'calcium', 'potassium', 'zinc', 'vitamin_C', 'iron', 'magnesium', 
-        'phosphorus', 'sodium', 'copper', 'vitamin_E', 'thiamin', 'riboflavin', 
-        'cholesterol', 'Niacin', 'vitamin_B_6', 'choline_total', 'vitamin_A', 
-        'vitamin_K', 'folate_total', 'vitamin_B_12', 'selenium', 'vitamin_D'
+        'vitamin_D', 'calcium',  'vitamin_C', 'iron', 'potassium', 
+        'vitamin_B_6', 'vitamin_B_12', 'vitamin_A', 'riboflavin', 'vitamin_E', 'folate_total',
+        'vitamin_K', 'zinc', 'magnesium','sodium',  'thiamin', 'Niacin',  'selenium'
     ]
     return df, original_df, categories, deficiencies
 

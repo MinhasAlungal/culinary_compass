@@ -491,7 +491,10 @@ def recipes_recommendation_sidebar():
         for display_name, key in nutrients:
             cols = st.sidebar.columns([1, 3])  # Create columns with 1:3 ratio
             with cols[0]:
-                st.write(f"{display_name}:")  # Label in first column
+                if display_name == "Calories":
+                    st.write(f"{display_name}\n (kcal):")
+                else:
+                    st.write(f"{display_name}\n (g):")  # Label in first column
             with cols[1]:
                 user_nutrients[key] = st.slider(
                     "##",  # Hidden label
