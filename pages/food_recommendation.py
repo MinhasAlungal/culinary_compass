@@ -498,7 +498,7 @@ def main():
                                 <div style="width: 20px;  height: 20px; border-radius: 50%; background: conic-gradient(#ff5900 {percentage}%, #d3d3d3 {percentage}%); margin-right: 10px;"></div>
                                 """
                                 # Append the nutrient and its corresponding circle to the display string
-                                nutrient_display += f"<div style='display: inline-block; font-size:12px;, text-align: center; margin-right: 15px;'><b>{nutrient.capitalize()}</b>{circle_html}</div>"
+                                nutrient_display += f"<div style='display: inline-block; font-size:12px;font-color: #82848f;text-align: center; margin-right: 15px;'><b>{nutrient.capitalize()}&nbsp;&nbsp;</b>{circle_html}</div>"
 
                             nutrient_display += "</div>"  # Close the flex container
 

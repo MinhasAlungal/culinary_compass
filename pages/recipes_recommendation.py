@@ -102,13 +102,10 @@ def show_nutrition_pie_chart(recipe):
         "Fat (g)": recipe.get("FatContent", 0),
         "Carbs (g)": recipe.get("CarbohydrateContent", 0),
         "Saturated Fat (g)": recipe.get("SaturatedFatContent", 0),
-        # convert cholesterol content from mg to g
-        "Cholesterol (g)": recipe.get("CholesterolContent", 0) / 1000,
-        # convert sodium content from mg to g
-        "Sodium (g)": recipe.get("SodiumContent", 0) / 1000,
+        "Cholesterol (g)": recipe.get("CholesterolContent", 0),
+        "Sodium (g)": recipe.get("SodiumContent", 0),
         "Fiber (g)": recipe.get("FiberContent", 0),
-        "Sugar (g)": recipe.get("SugarContent", 0),
-        "Other (g)": recipe.get("OtherNutrients", 0),
+        "Sugar (g)": recipe.get("SugarContent", 0)
     }
 
     # Filter out nutrients with zero values
@@ -139,8 +136,8 @@ def show_nutrition_pie_chart(recipe):
     wedges, texts, autotexts = ax.pie(
         values,
         colors=colors[:len(values)],
-        autopct='%1.1f%%',
-        # autopct=lambda pct: f'{pct:.1f}%' if pct > 5 else '',  # Only show percentage if > 5%
+        # autopct='%1.1f%%',
+        autopct=lambda pct: f'{pct:.1f}%' if pct > 5 else '',  # Only show percentage if > 5%
         pctdistance=0.75,
         startangle=90,
         wedgeprops={
@@ -554,16 +551,15 @@ def recipes_recommendation_sidebar():
 
                     with col1:
                         # to-be removed -- start
-                        st.write("**Calories**: " + str(recipe.get('Calories', 'N/A')))
-                        st.write("**Fat Content**: " + str(recipe.get('FatContent', 'N/A')))
-                        st.write("**Saturated Fat**: " + str(recipe.get('SaturatedFatContent', 'N/A')))
-                        st.write("**Cholesterol**: " + str(recipe.get('CholesterolContent', 'N/A')))
-                        st.write("**Sodium**: " + str(recipe.get('SodiumContent', 'N/A')))
-                        st.write("**Carbohydrates**: " + str(recipe.get('CarbohydrateContent', 'N/A')))
-                        st.write("**Fiber**: " + str(recipe.get('FiberContent', 'N/A')))
-                        st.write("**Sugar**: " + str(recipe.get('SugarContent', 'N/A')))
-                        st.write("**Protein**: " + str(recipe.get('ProteinContent', 'N/A'))) 
-                        st.write("**Other**: " + str(recipe.get('OtherNutrients', 'N/A')))
+                        # st.write("**Calories**: " + str(recipe.get('Calories', 'N/A')))
+                        # st.write("**Fat Content**: " + str(recipe.get('FatContent', 'N/A')))
+                        # st.write("**Saturated Fat**: " + str(recipe.get('SaturatedFatContent', 'N/A')))
+                        # st.write("**Cholesterol**: " + str(recipe.get('CholesterolContent', 'N/A')))
+                        # st.write("**Sodium**: " + str(recipe.get('SodiumContent', 'N/A')))
+                        # st.write("**Carbohydrates**: " + str(recipe.get('CarbohydrateContent', 'N/A')))
+                        # st.write("**Fiber**: " + str(recipe.get('FiberContent', 'N/A')))
+                        # st.write("**Sugar**: " + str(recipe.get('SugarContent', 'N/A')))
+                        # st.write("**Protein**: " + str(recipe.get('ProteinContent', 'N/A'))) 
                         # to-be removed -- end
 
                         ingredients = recipe.get('RecipeIngredientParts', 'N/A')
