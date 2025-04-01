@@ -111,10 +111,9 @@ def load_data():
     original_df = pd.read_csv("data/original/food.csv")
     categories = df["main_category"].unique().tolist()
     deficiencies = [
-        'calcium', 'potassium', 'zinc', 'vitamin_C', 'iron', 'magnesium', 
-        'phosphorus', 'sodium', 'copper', 'vitamin_E', 'thiamin', 'riboflavin', 
-        'cholesterol', 'Niacin', 'vitamin_B_6', 'choline_total', 'vitamin_A', 
-        'vitamin_K', 'folate_total', 'vitamin_B_12', 'selenium', 'vitamin_D'
+        'vitamin_D', 'calcium',  'vitamin_C', 'iron', 'potassium', 
+        'vitamin_B_6', 'vitamin_B_12', 'vitamin_A', 'riboflavin', 'vitamin_E', 'folate_total',
+        'vitamin_K', 'zinc', 'magnesium','sodium',  'thiamin', 'Niacin',  'selenium'
     ]
     return df, original_df, categories, deficiencies
 
@@ -498,7 +497,7 @@ def main():
                                 <div style="width: 20px;  height: 20px; border-radius: 50%; background: conic-gradient(#ff5900 {percentage}%, #d3d3d3 {percentage}%); margin-right: 10px;"></div>
                                 """
                                 # Append the nutrient and its corresponding circle to the display string
-                                nutrient_display += f"<div style='display: inline-block; font-size:12px;, text-align: center; margin-right: 15px;'><b>{nutrient.capitalize()}</b>{circle_html}</div>"
+                                nutrient_display += f"<div style='display: inline-block; font-size:12px;font-color: #82848f;text-align: center; margin-right: 15px;'><b>{nutrient.capitalize()}&nbsp;&nbsp;</b>{circle_html}</div>"
 
                             nutrient_display += "</div>"  # Close the flex container
 

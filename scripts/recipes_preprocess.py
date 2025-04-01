@@ -5,6 +5,14 @@ df = pd.read_csv("data/recipes.csv")
 # df =df.iloc[0:100000]
 df =df.iloc[0:3000] # For testing purposes
 
+# convert columns in mg to g
+in_mg = ['CholesterolContent', 'SodiumContent']
+
+in_grams = ['ProteinContent', 'FatContent', 'CarbohydrateContent', 'saturatedFatContent', 'FiberContent', 'SugarContent']
+
+# Convert units (grams to milligrams, micrograms to milligrams)
+df[in_mg] = df[in_mg] / 1000
+
 # Define non-vegetarian keywords
 non_veg_keywords = set([
     # Meat & Poultry

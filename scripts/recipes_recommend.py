@@ -129,8 +129,6 @@ def recommend_recipes(nutrients, ingredients, diet_preference):
 
       # Get top recommendations
     recommended_recipes["SimilarityScore"] = recommended_recipes.apply(lambda row:row["nutrient_similarity"]*0.5 + row["ingredient_similarity"]*0.5, axis=1)
-    
-
 
     # Sort recipes by similarity score
     recommended_recipes = recommended_recipes.sort_values(by="SimilarityScore", ascending=False)
