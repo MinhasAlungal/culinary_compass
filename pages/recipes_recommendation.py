@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import re
+import time
 from scripts.recipes_recommend import recommend_recipes
 
 # Set page config
@@ -125,7 +126,7 @@ def show_nutrition_pie_chart(recipe):
              "#9B59B6",     # Purple
              "#F4D03F",     # Yellow
              "#E67E22",     # Orange
-             "#2ECC71",     # Green
+             "#422314",     # brown
              "#E74C3C"]     # Red
 
     # Create figure with custom styling
@@ -469,6 +470,12 @@ def recipes_recommendation_sidebar():
         user_data = st.session_state['user_data']
         diet_preference = user_data.get('food_preference', None)
         selected_foods = st.session_state['selected_foods']
+        
+        models = ["all-MiniLM-L6-v2", 
+                #   "all-mpnet-base-v2", 
+                  "paraphrase-MiniLM-L6-v2"]
+        model_name = st.sidebar.selectbox("Select a model", models)
+
 
         # Create two columns in the sidebar with appropriate width ratio
         st.sidebar.markdown("### Nutrient Preferences")
@@ -513,9 +520,14 @@ def recipes_recommendation_sidebar():
             if not selected_foods:
                 st.error("No ingredients found. Please get food recommendations first.")
                 return
-
-            st.session_state["recommended_recipes"] = recommend_recipes(user_nutrients, selected_foods, diet_preference)
-
+            
+            # add a timer 
+            start_time = time.time()
+            st.session_state["recommended_recipes"] = recommend_recipes(user_nutrients, selected_foods, diet_preference, model_name)
+            end_time = time.time()
+            
+            st.write(f"Response time: {end_time - start_time:.2f} seconds")
+        
         # Ensure recipes persist across reruns
         recommended_recipes = st.session_state.get("recommended_recipes", [])
         # Show a reminder message when no recipes are recommended yet

@@ -2,8 +2,8 @@ import pandas as pd
 
 # Load dataset
 df = pd.read_csv("data/recipes.csv")
-# df =df.iloc[0:100000]
-df =df.iloc[0:3000] # For testing purposes
+df =df.iloc[0:100000]
+# df =df.iloc[0:3000] # For testing purposes
 
 # convert columns in mg to g
 in_mg = ['CholesterolContent', 'SodiumContent']
