@@ -19,7 +19,7 @@ class MyCustomClass:
 def load_data():
     """ Load dataset with embeddings """
     df = pd.read_csv("data/embeddings/recipes.csv")
-
+    
     # Ensure embeddings are properly converted to tensors and moved to the correct device
     df["IngredientEmbedding"] = df["IngredientEmbedding"].apply(lambda x: torch.tensor(eval(x)).to(device))
 
