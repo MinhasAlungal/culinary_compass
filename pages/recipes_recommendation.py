@@ -529,7 +529,8 @@ def recipes_recommendation_sidebar():
                     border-left: 5px solid #ff9800;
                     font-size: 18px;
                     font-weight: bold;
-                    color: #8a6d3b;">
+                    color: #8a6d3b;
+                    margin-bottom: 10px;">
                     Please select your dietary preference, adjust the sliders, and click <b>'Find Recipes'</b> to get recommendations.
                 </div>
                 """,
