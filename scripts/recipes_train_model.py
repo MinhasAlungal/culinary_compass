@@ -10,7 +10,7 @@ df = pd.read_csv("data/preprocessed/recipes.csv")
 #df =df.iloc[0:50000]
 
 # Initialize model
-# st_model = SentenceTransformer("all-MiniLM-L6-v2")
+#st_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 #all-mpnet-base-v2
 # st_model = SentenceTransformer("all-mpnet-base-v2") - Observation Recommendation gets better but slow compared to all-MiniLM-L6-v2 

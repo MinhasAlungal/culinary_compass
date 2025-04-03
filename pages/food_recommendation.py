@@ -8,6 +8,9 @@ SAVE_HISTORY_URL = f"{API_BASE_URL}/save-history/"
 GET_RECOMMENDATION_URL = f"{API_BASE_URL}/get-recommendation/"
 
 st.set_page_config(page_title="Food Recommendation System", layout="wide")
+##logo
+#st.sidebar.image("assets/logo.png", width=150)
+
 # Add this CSS for the page header
 st.markdown("""
     <style>
@@ -98,12 +101,12 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-        <div class="header-container">
-            <span class="header-icon">🍽️</span>
-            <h1>Culinary Compass <span style="font-size: 1.5rem; font-weight: 900;">- Flavor Meets Wellness</span></h1>
-        </div> 
-    """, unsafe_allow_html=True)
+# st.markdown("""
+#         <div class="header-container">
+#             <span class="header-icon">🍽️</span>
+#             <h1>Culinary Compass <span style="font-size: 1.5rem; font-weight: 900;">- Flavor Meets Wellness</span></h1>
+#         </div> 
+#     """, unsafe_allow_html=True)
 
 def load_data():
     """Load processed food data and extract unique categories."""
@@ -260,6 +263,21 @@ def display_selected_foods(selected_foods):
 
 def main():
     """Main function to run the Streamlit app."""
+    # Place the logo at the top-right
+    # Create columns for title + logo
+    col1, col2 = st.columns([5, 1])  # Adjust column width
+
+    with col1:
+        st.markdown("""
+        <div class="header-container">
+            <span class="header-icon">🍽️</span>
+            <h1>Culinary Compass <span style="font-size: 1.5rem; font-weight: 900;">- Flavor Meets Wellness</span></h1>
+        </div> 
+    """, unsafe_allow_html=True)
+        #st.title(f"Culinary Compass : Flavor Meets Wellness | {date.today().year}")  # Main title
+    
+    with col2:
+        st.image("assets/compass_white.png", width=120)  # Adjust width as needed
     
     # Clear session state when the page is loaded
     if 'user_data' not in st.session_state:
@@ -277,6 +295,7 @@ def main():
     df, original_df, categories, deficiencies = load_data()
 
     # Sidebar Input
+    
     st.sidebar.header("User Information")
     name = st.sidebar.text_input("Enter your name:")
     age = st.sidebar.number_input("Age:", min_value=1, value=25)
@@ -433,6 +452,7 @@ def main():
                 """,
                 unsafe_allow_html=True,
             )
+        
         st.image("assets/wellness.jpg", caption="Flavor meets wellness!", use_container_width=True)
     else: 
         user_data = st.session_state['user_data']
@@ -542,8 +562,9 @@ def main():
 
     # Footer
     st.markdown("---")
+    
     st.caption(f"Culinary Compass : Flavor Meets Wellness | {date.today().year}")
-
+    
 def clear_session():
     st.session_state['user_data'] = None
     st.session_state['recommendation'] = None
