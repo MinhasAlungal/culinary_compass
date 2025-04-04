@@ -29,11 +29,15 @@ st.markdown("""
         /* Style for the header container */
         .header-container {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 1rem;
+            align-items: left;
+            padding-top: 1rem;
             margin: 0;
-            
+            padding-bottom: 0.5rem;
+        }
+        .header{
+            font-size: 2rem;
+            font-weight: 600;
+            color: #262730;
         }
         /* Style for the header icon */
         .header-icon {
@@ -265,20 +269,19 @@ def main():
     """Main function to run the Streamlit app."""
     # Place the logo at the top-right
     # Create columns for title + logo
-    col1, col2 = st.columns([5, 1])  # Adjust column width
+    col1, col2 = st.columns([4, 2])  # Adjust column width
 
     with col1:
         st.markdown("""
-        <div class="header-container">
-            <span class="header-icon">🍽️</span>
-            <h1>Culinary Compass <span style="font-size: 1.5rem; font-weight: 900;">- Flavor Meets Wellness</span></h1>
-        </div> 
-    """, unsafe_allow_html=True)
-        #st.title(f"Culinary Compass : Flavor Meets Wellness | {date.today().year}")  # Main title
-    
+        <div class="header-container"></div> 
+        """, unsafe_allow_html=True)
+        st.image("assets/CulinaryCompass.png")  # logo with banner
     with col2:
-        st.image("assets/compass_white.png", width=120)  # Adjust width as needed
-    
+        st.markdown("""
+        <div class="header-container"></div> 
+        """, unsafe_allow_html=True)
+        #st.title(f"Culinary Compass : Flavor Meets Wellness | {date.today().year}")  # Main title
+
     # Clear session state when the page is loaded
     if 'user_data' not in st.session_state:
         st.session_state['user_data'] = None
