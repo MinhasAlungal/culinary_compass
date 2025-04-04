@@ -25,7 +25,7 @@ def load_data(file_path: Path) -> pd.DataFrame:
         st.stop()
 
 def create_deficiency_chart(df: pd.DataFrame):
-    st.title("Gender-wise Nutrient Deficiencies")
+    st.markdown('<div class="custom-subheader">Gender-wise Nutrient Deficiencies</div>', unsafe_allow_html=True)
     
     df_counts = (
         df.groupby(["Predicted Deficiency", "Gender"])
@@ -48,13 +48,27 @@ def create_deficiency_chart(df: pd.DataFrame):
         paper_bgcolor='white',
         font=dict(size=12),
         margin=dict(l=20, r=20, t=40, b=20),
-        height=500
+        height=400,
+        width=500,
+        title_font=dict(size=16),  # Title font size
+        xaxis=dict(
+            title_font=dict(size=14),  # X-axis title font size
+            tickfont=dict(size=12)     # X-axis tick labels font size
+        ),
+        yaxis=dict(
+            title_font=dict(size=14),  # Y-axis title font size
+            tickfont=dict(size=12)     # Y-axis tick labels font size
+        ),
+        legend=dict(
+            title_font=dict(size=14),  # Legend title font size
+            font=dict(size=12)         # Legend items font size
+        )
     )
     
     st.plotly_chart(fig, use_container_width=True)
 
 def create_disease_analysis(df: pd.DataFrame):
-    st.title("Deficiency & Disease Analysis")
+    st.markdown('<div class="custom-subheader">Deficiency & Disease Analysis</div>', unsafe_allow_html=True)
     
     selected_deficiencies = st.multiselect(
         "Select nutrient deficiencies:",
@@ -96,10 +110,31 @@ def create_disease_analysis(df: pd.DataFrame):
         font=dict(size=12),
         margin=dict(l=20, r=20, t=40, b=20),
         xaxis_tickangle=-45,
-        height=500
+        height=400,
+        width=500,
+        title_font=dict(size=16),  # Title font size
+        xaxis=dict(
+            title_font=dict(size=14),  # X-axis title font size
+            tickfont=dict(size=12)     # X-axis tick labels font size
+        ),
+        yaxis=dict(
+            title_font=dict(size=14),  # Y-axis title font size
+            tickfont=dict(size=12)     # Y-axis tick labels font size
+        ),
+        legend=dict(
+            title_font=dict(size=14),  # Legend title font size
+            font=dict(size=12)         # Legend items font size
+        )
     )
     
     st.plotly_chart(fig, use_container_width=True)
+
+def create_html_chord_chart():   
+    st.markdown('<div class="custom-subheader">Ingredient Co-occurrence Chord Diagram</div>', unsafe_allow_html=True)
+    with open("notebooks/chord_diagram.html", "r") as f:
+        html_content = f.read()
+
+    st.components.v1.html(html_content, height=550, scrolling=True)
 
 def main():
     # Custom CSS for full-width layout
@@ -116,6 +151,26 @@ def main():
         h1 {
             margin-top: 0 !important;
             padding-top: 0 !important;
+        }
+        .plot-description {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .sub-container-header {
+            color: #2E8B57;  /* Sea Green - represents health and nutrition */
+            font-size: 22px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .custom-subheader {
+            color: #FF6347;
+            font-size: 26px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
         /* Style for the header container */
         .header-container {
@@ -212,17 +267,53 @@ def main():
     # Load data
     df = load_data(DATA_PATH)
     
-    # Create two columns for the plots
-    with st.container():
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            create_deficiency_chart(df)
-        
-        with col2:
-            create_disease_analysis(df)
-        st.markdown('</div>', unsafe_allow_html=True)
+    # First section: Deficiency Chart with description
+    st.markdown('<div class="sub-container-header">Nutrient Deficiency Analysis</div>', unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        create_deficiency_chart(df)
+    
+    with col2:
+        st.markdown("""
+        <div class="plot-description">
+            <h3>Understanding Nutrient Deficiencies</h3>
+            <p>This visualization shows the distribution of nutrient deficiencies across different genders. 
+            The data reveals important patterns in how different nutrients affect various demographic groups, 
+            helping us understand where targeted nutritional interventions might be most needed.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Second section: Disease Analysis with description
+    st.markdown('<div class="sub-container-header">Disease Analysis</div>', unsafe_allow_html=True)
+    col3, col4 = st.columns(2)
+    
+    with col3:
+        st.markdown("""
+        <div class="plot-description">
+            <h3>Disease Patterns and Nutrient Deficiencies</h3>
+            <p>This analysis explores the relationship between nutrient deficiencies and various health conditions. 
+            By understanding these correlations, we can better predict and prevent health issues related to 
+            nutritional imbalances.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col4:
+        create_disease_analysis(df)
+    
+    # Third section: Chord Diagram with description
+    st.markdown('<div class="sub-container-header">Ingredient Relationships</div>', unsafe_allow_html=True)
+    
+    create_html_chord_chart()
+
+
+    st.markdown("""
+    <div class="plot-description">
+        <h3>Ingredient Co-occurrence Analysis</h3>
+        <p>The chord diagram visualizes the relationships between different ingredients in our dataset. 
+        This interactive visualization helps us understand which ingredients are commonly used together 
+        and can inform recipe recommendations and nutritional planning.</p>
+    </div> """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     st.set_page_config(layout="wide")
