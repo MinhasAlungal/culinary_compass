@@ -1,6 +1,7 @@
 # 🧭 Culinary Compass – NLP-Based Food & Recipe Recommendation System
 
 **Technologies:** Python, Streamlit, FastAPI, KNN, Sentence Transformers, Matplotlib, Seaborn, Git
+
 **Live Demo:** 👉 [Try the App](https://huggingface.co/spaces/minhasalungal/culinarycompass) 
 
 Culinary Compass is a recommendation system designed to suggest foods and recipes tailored to users' **micronutrient deficiencies** (e.g., Iron, Vitamin D), **nutritional goals**, and **dietary preferences** (e.g., vegetarian, non-vegetarian).
@@ -51,7 +52,7 @@ pip install --upgrade pip
 pip install -r requirements_dev.txt
 ```
 
-The `requirements_dev.txt` file contains the libraries needed for deployment.. of model or dashboard .. thus no jupyter or other libs used during development.
+
 
 
 
